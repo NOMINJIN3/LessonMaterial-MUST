@@ -15,3 +15,25 @@
 node_modules/
 .DS_Store
 
+# Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+
+# Android / Gradle
+.gradle/
+**/android/app/build/
+**/android/local.properties
+*.iml
+.idea/
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+
+# OS
+.DS_Store
