@@ -1,0 +1,17 @@
+# Big files
+*.zip
+*.rar
+*.7z
+
+
+# videos
+*.mp4
+*.mkv
+
+# java build
+*.class
+
+# node / system
+node_modules/
+.DS_Store
+

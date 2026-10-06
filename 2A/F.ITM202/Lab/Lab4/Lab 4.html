@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторийн Ажил 4</title>
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* General styling and font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb; /* Light gray background */
+            color: #1f2937;
+        }
+        .art-section {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        /* Styling for Canvas and SVG containers */
+        .drawing-container {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border: 2px solid #6366f1;
+            border-radius: 0.75rem;
+        }
+        
+        #natureCanvas {
+            width: 100%;
+            height: 100%;
+            /* Day sky color */
+            background-color: #87ceeb;
+        }
+
+        #townSVG {
+            width: 100%;
+            height: 100%;
+            background-color: #87ceeb; /* Clear day sky */
+        }
+
+        /* Media Player Styling */
+        .media-player {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-indigo-700 mb-2">Лабораторийн Ажил 4</h1>
+        <p class="text-xl text-gray-600">Дуу, Видео, Canvas, болон SVG элементүүд</p>
+    </header>
+
+    
+    <!-- Даалгавар №1: Дуу Оруулах (Audio Element) -->
+
+    <div class="art-section max-w-4xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-green-600">1. Дуу Оруулах (4-6 секундийн бичлэг)</h2>
+        <audio controls class="media-player rounded-lg shadow-lg">
+            <source src="Ungu.mp3" type="audio/mpeg">
+            Таны хөтөч аудио элементийг дэмжихгүй байна.
+        </audio>
+    </div>
+
+ 
+    <!-- Даалгавар №2: Видео Оруулах (Video Element) -->
+
+    <div class="art-section max-w-4xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-red-600">2. Видео Оруулах (3-4 секундийн бичлэг)</h2>
+        <video controls class="media-player rounded-lg shadow-lg" width="100%" height="auto" poster="https://placehold.co/720x405/eeeeee/333333?text=Video+Placeholder" onerror="this.onerror=null; this.src='https://placehold.co/720x405/eeeeee/333333?text=Video+Load+Error'">
+            <source src="Bichleg.mp4" type="video/mp4">
+            Таны хөтөч видео элементийг дэмжихгүй байна.
+        </video>
+    </div>
+
+
+
+  <!-- Дуу оруулах -->
+  <audio id="audio" controls>
+    <source src="Ungu.mp3" type="audio/mpeg">
+    Таны браузер аудио тоглуулахыг дэмжихгүй байна.
+  </audio>
+  
+    <!-- Даалгавар №3: Canvas Зураг  -->
+
+    <div class="art-section max-w-4xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-600">3. Canvas Зураг</h2>
+        <div class="drawing-container">
+            <canvas id="natureCanvas" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+
+    <!-- Даалгавар №4: SVG Зураг-->
+   
+    <div class="art-section max-w-4xl mx-auto">
+        <h2 class="text-2xl font-semibold mb-4 text-purple-600">4. SVG Зураг</h2>
+        
+            <!-- SVG content for vector graphics -->
+            <svg id="townSVG" viewBox="0 0 800 400">
+                <!-- Ground -->
+                <rect x="0" y="300" width="800" height="100" fill="#38a169" />
+
+                <!-- Sun (Circle) -->
+                <circle cx="700" cy="80" r="50" fill="#ffeb3b" />
+                <!-- Sun Rays (Lines) -->
+                <g fill="none" stroke="#ffeb3b" stroke-width="3">
+                    <line x1="700" y1="135" x2="700" y2="155" />
+                    <line x1="645" y1="80" x2="625" y2="80" />
+                    <line x1="755" y1="80" x2="775" y2="80" />
+                    <line x1="660" y1="120" x2="640" y2="140" />
+                    <line x1="740" y1="120" x2="760" y2="140" />
+                </g>
+
+                <!-- Clouds (Circles grouped) -->
+                <g id="cloud1" fill="#ffffff">
+                    <circle cx="100" cy="100" r="30" />
+                    <circle cx="130" cy="100" r="40" />
+                    <circle cx="160" cy="100" r="30" />
+                </g>
+                <g id="cloud2" fill="#ffffff" transform="translate(400, 50)">
+                    <circle cx="100" cy="100" r="25" />
+                    <circle cx="130" cy="100" r="35" />
+                    <circle cx="160" cy="100" r="25" />
+                </g>
+
+                <!-- House (Rectangles and Polygon) -->
+                <g id="house" transform="translate(150, 180)">
+                    <!-- Walls -->
+                    <rect x="0" y="0" width="150" height="120" fill="#f4a261" stroke="#264653" stroke-width="2" />
+                    <!-- Roof -->
+                    <polygon points="-10,0 160,0 75,-50" fill="#e76f51" stroke="#264653" stroke-width="2" />
+                    <!-- Window -->
+                    <rect x="20" y="30" width="30" height="30" fill="#90e0ef" />
+                    <!-- Door -->
+                    <rect x="100" y="60" width="30" height="60" fill="#585252" />
+                </g>
+
+                <!-- Car (Rectangles and Circles) -->
+                <g id="car" transform="translate(550, 270)">
+                    <!-- Body -->
+                    <rect x="0" y="10" width="120" height="40" rx="5" fill="#2a9d8f" />
+                    <!-- Cabin/Window area -->
+                    <rect x="20" y="0" width="80" height="15" fill="#90e0ef" />
+                    <!-- Wheels -->
+                    <circle cx="30" cy="50" r="10" fill="#264653" />
+                    <circle cx="100" cy="50" r="10" fill="#264653" />
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <!-- JavaScript for Canvas Drawing (Task 3) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('natureCanvas');
+            // Canvas-ийн хэмжээг тохируулах (HTML-д width/height тавиагүй байсан ч болно)
+            const WIDTH = 800;
+            const HEIGHT = 400;
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+
+            const ctx = canvas.getContext('2d');
+
+            /** Функц: Нар зурах (Өдөр) */
+            function drawSun(x, y, radius, color) {
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = color;
+                ctx.shadowColor = '#ffbb00';
+                ctx.shadowBlur = 40;
+                ctx.fill();
+                ctx.shadowBlur = 0; // Сүүдрийг унтраах
+                ctx.closePath();
+            }
+
+            /** Функц: Уулс зурах */
+            function drawMountains(color, baseLine) {
+                ctx.beginPath();
+                ctx.moveTo(0, baseLine); 
+
+                // Уул 1 (Том)
+                ctx.lineTo(150, baseLine - 150);
+                ctx.lineTo(300, baseLine);
+
+                // Уул 2 (Дунд)
+                ctx.lineTo(450, baseLine - 100);
+                ctx.lineTo(550, baseLine);
+
+                // Уул 3 (Жижиг)
+                ctx.lineTo(650, baseLine - 80);
+                ctx.lineTo(800, baseLine); 
+
+                ctx.lineTo(800, HEIGHT); 
+                ctx.lineTo(0, HEIGHT);   
+
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            /** Функц: Хүний дүрс зурах */
+            function drawPerson(x, y) {
+                ctx.fillStyle = '#1e3a8a'; 
+
+                // Толгой (Circle)
+                ctx.beginPath();
+                ctx.arc(x, y - 40, 10, 0, Math.PI * 2, false);
+                ctx.fill();
+                ctx.closePath();
+
+                // Бие (Rectangle)
+                ctx.fillRect(x - 8, y - 30, 16, 30); 
+
+                // Хөл (Lines)
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - 10, y + 20); 
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + 10, y + 20); 
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#1e3a8a';
+                ctx.stroke();
+                ctx.closePath();
+            }
+            
+            // 1. Нар зурах
+            drawSun(650, 80, 40, '#fef08a');
+
+            // 2. Уулс зурах (Урд)
+            drawMountains('#34d399', 320);
+
+            // 3. Уулс зурах (Хойд)
+            drawMountains('#059669', 340);
+
+            // 4. Хүний дүрс зурах
+            drawPerson(200, 320); 
+
+            // 5. Үүлс зурах
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            
+            // Үүл 1
+            ctx.beginPath();
+            ctx.arc(100, 100, 25, 0, Math.PI * 2);
+            ctx.arc(130, 90, 35, 0, Math.PI * 2);
+            ctx.arc(160, 100, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+
+            // Үүл 2
+            ctx.beginPath();
+            ctx.arc(400, 50, 20, 0, Math.PI * 2);
+            ctx.arc(430, 40, 30, 0, Math.PI * 2);
+            ctx.arc(460, 50, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+        });
+    </script>
+
+    <footer class="text-center mt-12 text-gray-500 text-sm">
+        <p>Лабораторийн Ажил 4</p>
+    </footer>
+
+</body>
+</html>

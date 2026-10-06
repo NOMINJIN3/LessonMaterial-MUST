@@ -1,0 +1,178 @@
+
+<style>
+  .wrap{display:flex;gap:8px;}
+  .col{flex:1;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;min-width:0;}
+  .col-head{padding:8px 10px;font-size:12.5px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);}
+  .r1h{background:#dbeafe;color:#1e3a8a;}
+  .r2h{background:#dcfce7;color:#14532d;}
+  .r3h{background:#fef9c3;color:#713f12;}
+  .sec{border-bottom:0.5px solid var(--color-border-tertiary);}
+  .sec:last-child{border-bottom:none;}
+  .sec-label{padding:4px 10px 2px;font-size:10px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.04em;background:var(--color-background-secondary);}
+  .cmd-row{padding:1px 10px;font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.75;}
+  .ind{padding-left:18px;color:var(--color-text-secondary);}
+  .hl{color:#1d4ed8;}
+  .hl2{color:#15803d;}
+  .save{background:#fef9c3;color:#713f12;font-family:var(--font-mono);font-size:11px;padding:4px 10px;}
+</style>
+
+<div class="wrap">
+
+<div class="col">
+  <div class="col-head r1h">R1</div>
+
+  <div class="sec">
+    <div class="sec-label">IPv6 идэвхижүүлэх</div>
+    <div class="cmd-row">R1(config)#<span class="hl">ipv6 unicast-routing</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/0 → R2 холбоос</div>
+    <div class="cmd-row">R1(config)#interface g0/0/0</div>
+    <div class="cmd-row ind">description Connection to R2</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:AB::1/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/1 → PC1 (LAN)</div>
+    <div class="cmd-row">R1(config)#interface g0/0/1</div>
+    <div class="cmd-row ind">description Connection to LAN</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:10::1/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Статик замчлал</div>
+    <div class="cmd-row">R1(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AC::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AB::2</span></div>
+    <div class="cmd-row">R1(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:20::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AB::2</span></div>
+    <div class="cmd-row">R1(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:30::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AB::2</span></div>
+  </div>
+
+  <div class="save">R1#copy running-config startup-config</div>
+</div>
+
+<div class="col">
+  <div class="col-head r2h">R2</div>
+
+  <div class="sec">
+    <div class="sec-label">IPv6 идэвхижүүлэх</div>
+    <div class="cmd-row">R2(config)#<span class="hl">ipv6 unicast-routing</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/0 → R1 холбоос</div>
+    <div class="cmd-row">R2(config)#interface g0/0/0</div>
+    <div class="cmd-row ind">description Connection to R1</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:AB::2/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/1 → R3 холбоос</div>
+    <div class="cmd-row">R2(config)#interface g0/0/1</div>
+    <div class="cmd-row ind">description Connection to R3</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:AC::1/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/2 → PC2 (LAN)</div>
+    <div class="cmd-row">R2(config)#interface g0/0/2</div>
+    <div class="cmd-row ind">description Connection to LAN</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:20::1/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Статик замчлал</div>
+    <div class="cmd-row">R2(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:10::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AB::1</span></div>
+    <div class="cmd-row">R2(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:30::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AC::2</span></div>
+  </div>
+
+  <div class="save">R2#copy running-config startup-config</div>
+</div>
+
+<div class="col">
+  <div class="col-head r3h">R3</div>
+
+  <div class="sec">
+    <div class="sec-label">IPv6 идэвхижүүлэх</div>
+    <div class="cmd-row">R3(config)#<span class="hl">ipv6 unicast-routing</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/0 → R2 холбоос</div>
+    <div class="cmd-row">R3(config)#interface g0/0/0</div>
+    <div class="cmd-row ind">description Connection to R2</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:AC::2/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">G0/0/1 → PC3 (LAN)</div>
+    <div class="cmd-row">R3(config)#interface g0/0/1</div>
+    <div class="cmd-row ind">description Connection to LAN</div>
+    <div class="cmd-row ind">ipv6 enable</div>
+    <div class="cmd-row ind"><span class="hl">ipv6 address 2001:ACAD:CAFE:30::FFFE/64</span></div>
+    <div class="cmd-row ind">no shutdown</div>
+    <div class="cmd-row ind">exit</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">Статик замчлал</div>
+    <div class="cmd-row">R3(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AB::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AC::1</span></div>
+    <div class="cmd-row">R3(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:10::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AC::1</span></div>
+    <div class="cmd-row">R3(config)#<span class="hl2">ipv6 route</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:20::/64</span></div>
+    <div class="cmd-row ind"><span class="hl2">2001:ACAD:CAFE:AC::1</span></div>
+  </div>
+
+  <div class="save">R3#copy running-config startup-config</div>
+</div>
+
+</div>
+
+<div style="margin-top:10px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;">
+  <div style="padding:5px 12px;font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-secondary);background:var(--color-background-secondary);border-bottom:0.5px solid var(--color-border-tertiary);">Шалгах командууд</div>
+  <div style="display:flex;gap:0;flex-wrap:wrap;">
+    <div style="flex:1;min-width:180px;border-right:0.5px solid var(--color-border-tertiary);padding:5px 12px;">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.8;">
+        show ipv6 interface brief<br>show ipv6 route<br>show running-config
+      </div>
+    </div>
+    <div style="flex:2;min-width:200px;padding:5px 12px;">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-text-primary);line-height:1.8;">
+        PC1&gt; ping 2001:ACAD:CAFE:20::2<br>
+        PC1&gt; ping 2001:ACAD:CAFE:30::2<br>
+        PC2&gt; ping 2001:ACAD:CAFE:30::2
+      </div>
+    </div>
+  </div>
+</div>

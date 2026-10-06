@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body { font-family: var(--font-sans); color: var(--color-text-primary); background: transparent; margin: 0; padding: 8px 0; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.tab { padding: 7px 22px; border-radius: var(--border-radius-md); cursor: pointer; font-size: 14px; font-weight: 500; border: 1px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-secondary); transition: all .15s; }
+.tab.active { background: #534AB7; color: #EEEDFE; border-color: #534AB7; }
+.tab:hover:not(.active) { border-color: var(--color-border-primary); color: var(--color-text-primary); }
+.panel { display: none; }
+.panel.active { display: block; }
+.section { margin-bottom: 14px; }
+.section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; letter-spacing: .03em; text-transform: uppercase; }
+pre { margin: 0; padding: 12px 14px; background: var(--color-background-tertiary); border-radius: var(--border-radius-md); font-family: var(--font-mono); font-size: 13px; line-height: 1.7; overflow-x: auto; border: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+.comment { color: var(--color-text-tertiary); }
+.cmd { color: var(--color-text-primary); }
+.highlight { color: #1D9E75; font-weight: 500; }
+.copy-btn { float: right; font-size: 11px; padding: 2px 10px; border-radius: 4px; border: 1px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; margin-left: 8px; }
+.copy-btn:hover { background: var(--color-background-primary); }
+.tip { font-size: 12px; color: var(--color-text-secondary); background: var(--color-background-secondary); border-left: 3px solid #534AB7; padding: 7px 12px; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="tabs">
+  <div class="tab active" onclick="show('r1')">R1</div>
+  <div class="tab" onclick="show('r2')">R2</div>
+  <div class="tab" onclick="show('r3')">R3</div>
+</div>
+
+<!-- R1 -->
+<div class="panel active" id="r1">
+  <div class="section">
+    <div class="section-label">Суурь тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r1-base')">Хуулах</button>
+    <pre id="r1-base"><span class="comment">! ── R1 суурь тохиргоо ──────────────────────</span>
+<span class="cmd">enable
+configure terminal
+hostname R1
+enable secret Cisco123
+no ip domain-lookup
+banner motd # R1 - Зөвшөөрөлтэй хэрэглэгч #
+
+line console 0
+ password Con123
+ login
+ logging synchronous
+ exit
+
+line vty 0 4
+ password Vty123
+ login
+ transport input ssh telnet
+ exit
+
+service password-encryption</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Интерфейс тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r1-int')">Хуулах</button>
+    <pre id="r1-int"><span class="comment">! ── R1 интерфейсүүд ────────────────────────</span>
+<span class="comment">! G0/0/0 → R2 холболт (WAN)</span>
+<span class="cmd">interface GigabitEthernet0/0/0
+ description Link to R2
+ ip address 172.16.10.1 255.255.255.252
+ no shutdown
+ exit</span>
+
+<span class="comment">! G0/0/1 → S1 switch / PC1 LAN</span>
+<span class="cmd">interface GigabitEthernet0/0/1
+ description Link to S1-LAN
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+ exit</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Статик замчлал (Static Routes)</div>
+    <button class="copy-btn" onclick="copyCode('r1-route')">Хуулах</button>
+    <pre id="r1-route"><span class="comment">! ── R1 статик замчлал ──────────────────────</span>
+<span class="comment">! PC2 сүлжээ рүү (192.168.20.0/24) → R2 дамжуулан</span>
+<span class="cmd">ip route 192.168.20.0 255.255.255.0 172.16.10.2</span>
+
+<span class="comment">! PC3 сүлжээ рүү (192.168.30.0/24) → R2 дамжуулан</span>
+<span class="cmd">ip route 192.168.30.0 255.255.255.0 172.16.10.2</span>
+
+<span class="comment">! R2-R3 холбоос сүлжээ рүү (172.16.10.4/30)</span>
+<span class="cmd">ip route 172.16.10.4 255.255.255.252 172.16.10.2
+
+end
+write memory</span></pre>
+  </div>
+  <div class="tip">Шалгах: <code>show ip route</code> · <code>show ip interface brief</code> · <code>ping 192.168.20.1</code></div>
+</div>
+
+<!-- R2 -->
+<div class="panel" id="r2">
+  <div class="section">
+    <div class="section-label">Суурь тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r2-base')">Хуулах</button>
+    <pre id="r2-base"><span class="comment">! ── R2 суурь тохиргоо ──────────────────────</span>
+<span class="cmd">enable
+configure terminal
+hostname R2
+enable secret Cisco123
+no ip domain-lookup
+banner motd # R2 - Зөвшөөрөлтэй хэрэглэгч #
+
+line console 0
+ password Con123
+ login
+ logging synchronous
+ exit
+
+line vty 0 4
+ password Vty123
+ login
+ transport input ssh telnet
+ exit
+
+service password-encryption</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Интерфейс тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r2-int')">Хуулах</button>
+    <pre id="r2-int"><span class="comment">! ── R2 интерфейсүүд ────────────────────────</span>
+<span class="comment">! G0/0/0 → R1 холболт</span>
+<span class="cmd">interface GigabitEthernet0/0/0
+ description Link to R1
+ ip address 172.16.10.2 255.255.255.252
+ no shutdown
+ exit</span>
+
+<span class="comment">! G0/0/1 → R3 холболт</span>
+<span class="cmd">interface GigabitEthernet0/0/1
+ description Link to R3
+ ip address 172.16.10.5 255.255.255.252
+ no shutdown
+ exit</span>
+
+<span class="comment">! G0/0/2 → S2 switch / PC2 LAN</span>
+<span class="cmd">interface GigabitEthernet0/0/2
+ description Link to S2-LAN
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+ exit</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Статик замчлал (Static Routes)</div>
+    <button class="copy-btn" onclick="copyCode('r2-route')">Хуулах</button>
+    <pre id="r2-route"><span class="comment">! ── R2 статик замчлал ──────────────────────</span>
+<span class="comment">! PC1 сүлжээ рүү (192.168.10.0/24) → R1 дамжуулан</span>
+<span class="cmd">ip route 192.168.10.0 255.255.255.0 172.16.10.1</span>
+
+<span class="comment">! PC3 сүлжээ рүү (192.168.30.0/24) → R3 дамжуулан</span>
+<span class="cmd">ip route 192.168.30.0 255.255.255.0 172.16.10.6
+
+end
+write memory</span></pre>
+  </div>
+  <div class="tip">Шалгах: <code>show ip route</code> · <code>ping 192.168.10.1</code> · <code>ping 192.168.30.254</code></div>
+</div>
+
+<!-- R3 -->
+<div class="panel" id="r3">
+  <div class="section">
+    <div class="section-label">Суурь тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r3-base')">Хуулах</button>
+    <pre id="r3-base"><span class="comment">! ── R3 суурь тохиргоо ──────────────────────</span>
+<span class="cmd">enable
+configure terminal
+hostname R3
+enable secret Cisco123
+no ip domain-lookup
+banner motd # R3 - Зөвшөөрөлтэй хэрэглэгч #
+
+line console 0
+ password Con123
+ login
+ logging synchronous
+ exit
+
+line vty 0 4
+ password Vty123
+ login
+ transport input ssh telnet
+ exit
+
+service password-encryption</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Интерфейс тохиргоо</div>
+    <button class="copy-btn" onclick="copyCode('r3-int')">Хуулах</button>
+    <pre id="r3-int"><span class="comment">! ── R3 интерфейсүүд ────────────────────────</span>
+<span class="comment">! G0/0/0 → R2 холболт</span>
+<span class="cmd">interface GigabitEthernet0/0/0
+ description Link to R2
+ ip address 172.16.10.6 255.255.255.252
+ no shutdown
+ exit</span>
+
+<span class="comment">! G0/0/1 → S3 switch / PC3 LAN</span>
+<span class="cmd">interface GigabitEthernet0/0/1
+ description Link to S3-LAN
+ ip address 192.168.30.254 255.255.255.0
+ no shutdown
+ exit</span></pre>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Статик замчлал (Static Routes)</div>
+    <button class="copy-btn" onclick="copyCode('r3-route')">Хуулах</button>
+    <pre id="r3-route"><span class="comment">! ── R3 статик замчлал ──────────────────────</span>
+<span class="comment">! PC1 сүлжээ рүү (192.168.10.0/24) → R2 дамжуулан</span>
+<span class="cmd">ip route 192.168.10.0 255.255.255.0 172.16.10.5</span>
+
+<span class="comment">! PC2 сүлжээ рүү (192.168.20.0/24) → R2 дамжуулан</span>
+<span class="cmd">ip route 192.168.20.0 255.255.255.0 172.16.10.5</span>
+
+<span class="comment">! R1-R2 холбоос сүлжээ рүү (172.16.10.0/30)</span>
+<span class="cmd">ip route 172.16.10.0 255.255.255.252 172.16.10.5
+
+end
+write memory</span></pre>
+  </div>
+  <div class="tip">Шалгах: <code>show ip route</code> · <code>ping 192.168.10.2</code> · <code>ping 192.168.20.2</code></div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function copyCode(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText.replace(/^[!].*\n/gm, m => m); // keep comments
+  navigator.clipboard.writeText(el.innerText).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Хуулагдлаа ✓';
+    setTimeout(() => btn.textContent = 'Хуулах', 1500);
+  });
+}
+</script>
+</body>
+</html>

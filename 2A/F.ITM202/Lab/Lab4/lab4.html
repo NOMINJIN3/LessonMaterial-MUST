@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h1>Лабораторийн ажил 4 — Дуу, Видео, Canvas, SVG</h1>
+<h2>Даалгавар №1 — Дуу оруулж тоглуулах</h2>
+
+<audio controls>
+<source src="Ungu.ogg" type="audio/ogg">
+<source src="Ungu.mp3" type="audio/mpeg">
+</audio>
+
+<h2>Даалгавар №2 — Видео оруулж тоглуулах</h2>
+<video width="320" src="bichleg.mp4" height="240" poster="bichleg.jpg" autoplay controls loop>
+This content ap pears if the video tag or the codes is not supported.
+</video>
+
+
+
+<h3>Даалгавар №3 - Дуу, Canvas ашиглан зураг зурах</h2>
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <title>Даалгавар №3 — Дуу, Canvas ашиглан зураг зурах</title>
+  <style>
+    body { 
+      font-family: sans-serif; 
+      padding: 20px;
+      background: #f0f9ff;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background: linear-gradient(#87CEEB, #E0FFFF);
+      display: block;
+      margin-top: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Даалгавар №3 — Дуу, Canvas ашиглан зураг зурах</h2>
+  <p>Дуугаа сонсоход Canvas дээр нар, уул, хүн гэх мэт дүрс хөдөлнө.</p>
+
+  <!-- Дуу оруулах -->
+  <audio id="audio" controls>
+    <source src="myvoice.mp3" type="audio/mpeg">
+    Таны браузер аудио тоглуулахыг дэмжихгүй байна.
+  </audio>
+
+  <!-- Canvas -->
+  <canvas id="scene" width="700" height="350"></canvas>
+
+  <script>
+    const canvas = document.getElementById("scene");
+    const ctx = canvas.getContext("2d");
+    const audio = document.getElementById("audio");
+
+    let sunAngle = 0;
+    let personY = 0;
+    let dir = 1;
+    let animationId;
+
+    // Байгаль зурах функц
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // тэнгэр
+      const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+      grad.addColorStop(0, "#87CEEB");
+      grad.addColorStop(1, "#E0FFFF");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // нар
+      const sunX = 100 + Math.sin(sunAngle) * 20;
+      const sunY = 60 + Math.cos(sunAngle) * 10;
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 30, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFD700";
+      ctx.fill();
+
+      // уул
+      ctx.fillStyle = "#6B8E23";
+      ctx.beginPath();
+      ctx.moveTo(0, 250);
+      ctx.lineTo(150, 120);
+      ctx.lineTo(300, 250);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(200, 250);
+      ctx.lineTo(350, 100);
+      ctx.lineTo(500, 250);
+      ctx.closePath();
+      ctx.fill();
+
+      // газар
+      ctx.fillStyle = "#228B22";
+      ctx.fillRect(0, 250, canvas.width, 100);
+
+      // хүн (жижиг stick figure)
+      const x = 400, y = 240 + personY;
+      ctx.beginPath(); ctx.arc(x, y - 25, 8, 0, Math.PI * 2); ctx.fillStyle = "#FFE4C4"; ctx.fill(); // head
+      ctx.beginPath(); ctx.moveTo(x, y - 17); ctx.lineTo(x, y + 15); ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke(); // body
+      ctx.beginPath(); ctx.moveTo(x, y - 5); ctx.lineTo(x - 10, y + 5); ctx.moveTo(x, y - 5); ctx.lineTo(x + 10, y + 5); ctx.stroke(); // arms
+      ctx.beginPath(); ctx.moveTo(x, y + 15); ctx.lineTo(x - 8, y + 30); ctx.moveTo(x, y + 15); ctx.lineTo(x + 8, y + 30); ctx.stroke(); // legs
+
+      // цэцэг
+      for (let i = 50; i < 700; i += 100) {
+        ctx.beginPath();
+        ctx.arc(i, 280, 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#FF69B4";
+        ctx.fill();
+      }
+    }
+
+    function animate() {
+      sunAngle += 0.02;
+      personY += dir * 0.4;
+      if (personY > 4 || personY < -4) dir *= -1;
+
+      drawScene();
+      animationId = requestAnimationFrame(animate);
+    }
+
+    audio.addEventListener("play", () => {
+      cancelAnimationFrame(animationId);
+      animate();
+    });
+
+    audio.addEventListener("pause", () => cancelAnimationFrame(animationId));
+    audio.addEventListener("ended", () => cancelAnimationFrame(animationId));
+
+    drawScene(); // анхны зураг
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
