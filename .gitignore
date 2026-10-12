@@ -37,3 +37,4 @@ build/
 
 # OS
 .DS_Store
+*.whl
