@@ -1,4 +1,0 @@
-USE TestDB;
-CREATE TABLE Students (Id INT PRIMARY KEY, Name NVARCHAR(50));
-INSERT INTO Students VALUES (1, 'Nominjin');
-SELECT * FROM Students;
