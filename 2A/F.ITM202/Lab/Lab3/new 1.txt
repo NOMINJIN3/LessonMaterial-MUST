@@ -1,0 +1,433 @@
+<html>
+<head>
+    <title>Миний Формууд - Лаборатори-3</title>
+</head>
+<body bgcolor="pink">
+    <form name="MyForm" action="success.html" method="post">
+
+        <center>
+            <h1><font color="#A52A2A">Лаборатори-3</font></h1>
+        </center>
+
+        <h2>1. CV - Forms</h2>
+        <table border="1" cellpadding="6" cellspacing="0" width='80%' align="center">
+            
+            <tr>
+                <td rowspan="13" align="center" width="20%">
+                    <div>
+                        <label for="my_file">Файл сонгох:</label>
+                        <input type="file" name="myfile" id="my_file" size="20">
+                    </div>
+                </td>
+                
+                <td><b><label for="o_cod">Оюутны код:</label></b></td>
+                <td><input type="text" name="Ocod" id="o_cod" size="15" maxlength="10" placeholder="Кодоо бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="salbar_select">Салбар:</label></b></td>
+                <td>
+                    <select name="salbar" id="salbar_select">
+                        <option value="cm">Компьютерийн ухааны тэнхим</option>
+                        <option value="mt">Мэдээллийн технологийн тэнхим</option>
+                        <option value="el">Электроникийн тэнхим</option>
+                        <option value="ms">Мэдээллийн сүлжээ, аюулгүй байдлын тэнхим</option>
+                        <option value="hi">Холбоооны инженерчлэлийн тэнхим</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><b><label for="hutulbur_select">Хөтөлбөр:</label></b></td>
+                <td>
+                    <select name="hutulbur" id="hutulbur_select">
+                        <option value="mt">Мэдээллийн технологи</option>
+                        <option value="ms">Мэдээллийн систем</option>
+                        <option value="ou">Өгөгдлийн ухаан</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><b><label for="u_ovog">Ургийн овог:</label></b></td>
+                <td><input type="text" name="uovog" id="u_ovog" size="15" maxlength="25" placeholder="Ургийн овгоо бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="ovog">Овог:</label></b></td>
+                <td><input type="text" name="ovog" id="ovog" size="15" maxlength="25" placeholder="Овгоо бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="ner">Нэр:</label></b></td>
+                <td><input type="text" name="ner" id="ner" size="15" maxlength="25" placeholder="Нэрээ бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><strong><label for="nas">Нас:</label></strong></td>
+                <td><input type="number" name="nas" id="nas" min="0" max="100"></td>
+            </tr>
+
+            <tr>
+                <td><b><label>Хүйс:</label></b></td>
+                <td>
+                    <label for="huis_em">Эм</label>:<input type="radio" name="huis" id="huis_em" value="Эм">
+                    <label for="huis_er">Эр</label>:<input type="radio" name="huis" id="huis_er" value="Эр">
+                </td>
+            </tr>
+
+            <tr>
+                <td><b><label for="birthday">Төрсөн огноо:</label></b></td>
+                <td><input type="date" id="birthday" name="birthday"></td>
+            </tr>
+
+            <tr>
+                <td rowspan="2"><b><label>Утас:</label></b></td>
+                <td>+976 <input type="tel" name="utas1" id="utas1" placeholder="Утас 1"></td>
+            </tr>
+            <tr>
+                <td>+976 <input type="tel" name="utas2" id="utas2" placeholder="Утас 2"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="mail">Email:</label></b></td>
+                <td><input type="email" name="mail" id="mail" placeholder="Цахим шуудангаа бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="fb_url">Facebook хаяг:</label></b></td>
+                <td><input type="url" name="fb" id="fb_url" placeholder="Цахим хаягаа бичнэ үү"></td>
+            </tr>
+
+            <tr>
+                <td><b><label for="home">Гэрийн хаяг:</label></b></td>
+                <td colspan="2"><textarea name="home" id="home" rows="2" cols="30" placeholder="Гэрийн хаягаа бичнэ үү"></textarea></td>
+            </tr>
+
+            <tr><th colspan="3"><center>Нэмэлт мэдээлэл</center></th></tr>
+            
+            <tr>
+                <td rowspan="3"><b><label>Боловсрол:</label></b></td>
+                <td colspan="2"><input type="checkbox" name="edu_baga" id="edu_baga" value="Baga"> <label for="edu_baga">Бага</label></td>
+            </tr>
+            <tr><td colspan="2"><input type="checkbox" name="edu_dund" id="edu_dund" value="Dund"> <label for="edu_dund">Дунд</label></td></tr>
+            <tr><td colspan="2"><input type="checkbox" name="edu_deed" id="edu_deed" value="Deed"> <label for="edu_deed">Дээд</label></td></tr>
+
+            <tr>
+                <td rowspan="3"><b><label>Садан төрлийн байдал:</label></b></td>
+                <td>
+                    <select name="sadan_type_1" id="sadan_type_1" size="1">
+                        <option value="father">Аав</option>
+                        <option value="mother">Ээж</option>
+                        <option value="younger_sibling">Дүү</option>
+                        <option value="older_brother">Ах</option>
+                        <option value="older_sister">Эгч</option>
+                    </select>
+                </td>
+                <td><input type="text" name="sadan_name_1" id="sadan_name_1" size="20" maxlength="20" placeholder="Садан төрлийн нэр"></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <select name="sadan_type_2" id="sadan_type_2" size="1">
+                        <option value="father">Аав</option>
+                        <option value="mother">Ээж</option>
+                        <option value="younger_sibling">Дүү</option>
+                        <option value="older_brother">Ах</option>
+                        <option value="older_sister">Эгч</option>
+                    </select>
+                </td>
+                <td><input type="text" name="sadan_name_2" id="sadan_name_2" size="20" maxlength="20" placeholder="Садан төрлийн нэр"></td>
+            </tr>
+
+            <tr>
+                <td>
+                    <select name="sadan_type_3" id="sadan_type_3" size="1">
+                        <option value="father">Аав</option>
+                        <option value="mother">Ээж</option>
+                        <option value="younger_sibling">Дүү</option>
+                        <option value="older_brother">Ах</option>
+                        <option value="older_sister">Эгч</option>
+                    </select>
+                </td>
+                <td><input type="text" name="sadan_name_3" id="sadan_name_3" size="20" maxlength="20" placeholder="Садан төрлийн нэр"></td>
+            </tr>
+
+            <tr>
+                <td rowspan="2"><b><label>Ур чадвар:</label></b></td>
+                <td>
+                    <select name="skill_type_1" id="skill_type_1" size="1">
+                        <option value="office_software">Оффисын ПХ</option>
+                        <option value="presentation">Илтгэх</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="skill_level_1" id="skill_level_1" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <select name="skill_type_2" id="skill_type_2" size="1">
+                        <option value="device_tech">ТХ төхөөрөмж</option>
+                        <option value="talent">Авьяас</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="skill_level_2" id="skill_level_2" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td><b><label for="work_exp_1">Ажлын туршлага:</label></b></td>
+                <td><input type="text" name="work_exp_1" id="work_exp_1" size="20" maxlength="30" placeholder="Ажлын туршлага 1"></td>
+                <td><input type="text" name="work_exp_2" id="work_exp_2" size="20" maxlength="30" placeholder="Ажлын туршлага 2"></td>
+            </tr>
+
+            <tr>
+                <td rowspan="2"><b><label>Хэлний чадвар:</label></b></td>
+                <td>Монгол</td>
+                <td>
+                    Унших
+                    <select name="mongol_read" id="mongol_read" size="1">
+                        <option value="Very good">Сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                    <br>Ярих
+                    <select name="mongol_speak" id="mongol_speak" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                    <br>Бичих
+                    <select name="mongol_write" id="mongol_write" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Англи</td>
+                <td>
+                    Унших
+                    <select name="english_read" id="english_read" size="1">
+                        <option value="Very good">Сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                    <br>Ярих
+                    <select name="english_speak" id="english_speak" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                    <br>Бичих
+                    <select name="english_write" id="english_write" size="1">
+                        <option value="Very good">Маш сайн</option>
+                        <option value="Good">Дунд</option>
+                        <option value="Bad">Муу</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td rowspan="3"><b><label>Хобби:</label></b></td>
+                <td colspan="2"><input type="checkbox" name="hobby_book" id="hobby_book"> <label for="hobby_book">Ном унших</label></td>
+            </tr>
+            <tr><td colspan="2"><input type="checkbox" name="hobby_tennis" id="hobby_tennis" value="play tennis "> <label for="hobby_tennis">Ширээний теннис тоглох</label></td></tr>
+            <tr>
+                <td colspan="2">
+                    <input type="checkbox" name="hobby_walk" id="hobby_walk" value="walk mountain"> <label for="hobby_walk">Ууланд алхах</label>
+                    <input type="checkbox" name="hobby_chess" id="hobby_chess" value="chess"> <label for="hobby_chess">Шатар тоглох</label>
+                </td>
+            </tr>
+
+            <tr>
+                <td rowspan="3"><b><label>Авьяас, чадвар:</label></b></td>
+                <td colspan="2"><input type="checkbox" name="talent_guitar" id="talent_guitar" value="guitar"> <label for="talent_guitar">Гитар тоглох</label></td>
+            </tr>
+            <tr><td colspan="2"><input type="checkbox" name="talent_cook" id="talent_cook" value="cook"> <label for="talent_cook">Хоол хийх</label></td></tr>
+            <tr><td colspan="2"><input type="checkbox" name="talent_song" id="talent_song" value="song"> <label for="talent_song">Дуу дуулах</label></td></tr>
+
+            <tr>
+                <td><b><label>Шагнал, урамшуулал:</label></b></td>
+                <td colspan="2">
+                    <input type="checkbox" name="award_mzy" id="award_mzy" value="mzy award"> <label for="award_mzy">МЗХ Тэргүүний оюутан</label>
+                    <input type="checkbox" name="award_sutis" id="award_sutis" value="sutis student"> <label for="award_sutis">ШУТИС Шилдэг оюутан</label>
+                </td>
+            </tr>
+        </table>
+        
+        <h2>2. Хичээл сонголт №1</h2>
+        <table border="1" cellpadding="6" cellspacing="0" align="center">
+            <tr>
+                <th>№</th>
+                <th>Хичээлийн код</th>
+                <th>Хичээлийн нэр</th>
+                <th>Кредит</th>
+                <th>Орох хэлбэр</th>
+            </tr>
+            
+            <tr>
+                <td>1</td>
+                <td>
+                    <select name="lesson_1_code" id="lesson_1_code" size="1">
+                        <option value="f.itm202">F.ITM202</option>
+                        <option value="f.itm203">F.ITM203</option>
+                        <option value="f.itm201">F.ITM201</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_1_name" id="lesson_1_name" size="1">
+                        <option value="veb">Веб зохиомж</option>
+                        <option value="vsys">Веб систем</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_1_credit" id="lesson_1_credit" size="1">
+                        <option value="3kr">3кр</option>
+                        <option value="2kr">2кр</option>
+                        <option value="1kr">1кр</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_1_type" id="lesson_1_type" size="1">
+                        <option value="lec">Лекц</option>
+                        <option value="lab">Лаб</option>
+                        <option value="sem">Семинар</option>
+                    </select>
+                </td>
+            </tr>
+            
+            <tr><td>2</td><td>F.ITA101</td><td>Мэргэжлийн удиртгал</td><td>1кр</td><td>Лекц</td></tr>
+            <tr><td>3</td><td>F.CSM203</td><td>Өгөгдлийн бүтэц ба алгоритм</td><td>3кр</td><td>Лекц,Лаб,Бие даалт</td></tr>
+            <tr><td>4</td><td>F.ITM204</td><td>Өгөгдлийн сангийн систем</td><td>3кр</td><td>Лекц, сем</td></tr>
+            <tr><td>5</td><td>S.EEM101</td><td>Инженерчлэлийн эдийн засаг</td><td>3кр</td><td>Сем, биедаалт</td></tr>
+            <tr><td>6</td><td>S.ESM201</td><td>Шинжлэх ухаан технологийн англи хэл</td><td>2кр</td><td>Сем, биедаалт</td></tr>
+        </table>
+
+        <h2>3. Хичээлийн хуваарь</h2>
+        <table border="1" cellpadding="6" cellspacing="0" align="center">
+            <tr>
+                <th>№</th>
+                <th>Хичээлийн код, нэр</th>
+                <th>Багш</th>
+                <th>Лекц</th>
+                <th>Лаб/Семинар</th>
+            </tr>
+            
+            <tr>
+                <td>1</td>
+                <td>F.ITM203, Өгөгдлийн бүтэц ба алгоритм</td>
+                <td>Д.Батмөнх</td>
+                <td>
+                    <select name="lesson_schedule_1_lec" id="lesson_schedule_1_lec" size="1">
+                        <option value="4-1,VI-229">4-1,VI-229</option>
+                        <option value="4-3, цахим">4-3, Цахим</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_schedule_1_lab" id="lesson_schedule_1_lab" size="1">
+                        <option value="1-1,VI-110">1-1,VI-110</option>
+                        <option value="2-1,VI-110">2-1,VI-110</option>
+                        <option value="2-2,VI-110">2-2,VI-110</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>S.ESM201, Шинжлэх ухаан технологийн англи хэл</td>
+                <td>Д.Дуламсүрэн</td>
+                <td>
+                    <select name="lesson_schedule_2_lec" id="lesson_schedule_2_lec" size="1">
+                        <option value="1-2,VI-204">1-2,VI-204</option>
+                        <option value="4-3,VI-204">4-3,VI-204</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_schedule_2_lab" id="lesson_schedule_2_lab" size="1">
+                        <option value="5-1,VI-204">5-1,VI-204</option>
+                        <option value="2-1,VI-110">2-1,VI-110</option>
+                        <option value="2-2,VI-110">2-2,VI-110</option>
+                    </select>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>3</td>
+                <td>S.EEM101, Инженерчлэлийн эдийн засаг</td>
+                <td>Ц.Ариунаа</td>
+                <td>
+                    <select name="lesson_schedule_3_lec" id="lesson_schedule_3_lec" size="1">
+                        <option value="1-3,VI-229">1-3,VI-229</option>
+                        <option value="1-3,VI-401">1-3,VI-401</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_schedule_3_lab" id="lesson_schedule_3_lab" size="1">
+                        <option value="1-4,VI-105">1-4,VI-105</option>
+                        <option value="1-5,VI-106">1-5,VI-106</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>F.ITM204, Өгөгдлийн сангийн систем</td>
+                <td>Ц.Баатархүү</td>
+                <td>
+                    <select name="lesson_schedule_4_lec" id="lesson_schedule_4_lec" size="1">
+                        <option value="2-2,VI-229">2-2,VI-229</option>
+                        <option value="1-3,VI-401">1-3,VI-401</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_schedule_4_lab" id="lesson_schedule_4_lab" size="1">
+                        <option value="3-3,VI-105">3-3,VI-105</option>
+                        <option value="2-3,VI-106">2-3,VI-106</option>
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>F.ITM202, Веб зохиомж</td>
+                <td>Ө.Сүх-Очир</td>
+                <td>
+                    <select name="lesson_schedule_5_lec" id="lesson_schedule_5_lec" size="1">
+                        <option value="1-5,VI-229">1-5,VI-229</option>
+                        <option value="1-5,VI-406">1-5,VI-406</option>
+                        <option value="1-5,Цахим">1-5,Цахим</option>
+                    </select>
+                </td>
+                <td>
+                    <select name="lesson_schedule_5_lab" id="lesson_schedule_5_lab" size="1">
+                        <option value="2-4,VI-121">2-4,VI-121</option>
+                        <option value="2-5,VI-121">2-5,VI-121</option>
+                        <option value="2-6,VI-121">2-6,VI-121</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+        <br>
+        <center>
+            <input type="reset" value="Цэвэрлэх">
+            <input type="submit" value="Илгээх">
+        </center>
+        <br>
+    </form>
+</body>
+</html>
