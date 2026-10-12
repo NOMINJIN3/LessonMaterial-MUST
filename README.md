@@ -40,7 +40,7 @@
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B/S.PSM201">S.PSM201</a> - Магадлалын онол ба математик статистик
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B">F.ITA361</a> - Танилцах дадлага
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A">3A</a>
-* <a href="">S.DSM201</a> - Дискрет бүтэц
+* <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/S.DSM201">S.DSM201</a> - Дискрет бүтэц
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.CSM200">F.CSM200</a> - Хиймэл оюун ухааны үндэс
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.CSM302">F.CSM302</a> - Үйлдлийн систем
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM237">F.ITM237</a> - Өгөгдлийн сангийн удирдлага
