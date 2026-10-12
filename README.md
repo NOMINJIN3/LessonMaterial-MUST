@@ -38,6 +38,7 @@
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B/F.ITM312">F.ITM312</a> - Компьютерийн ёс зүй
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B/F.NSM201">F.NSM201</a> - Компьютерийн сүлжээ
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B/S.PSM201">S.PSM201</a> - Магадлалын онол ба математик статистик
+* <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/2B">F.ITA361</a> - Танилцах дадлага
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A">3A</a>
 * <a href="">S.DSM201</a> - Дискрет бүтэц
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.CSM200">F.CSM200</a> - Хиймэл оюун ухааны үндэс
@@ -46,6 +47,15 @@
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM311">F.ITM311</a> - Систетийн шинжилгээ ба зохиомж
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM309">F.ITM309</a> - Мобайл технологи
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM302">F.ITM302</a> - Систем ба сүлжээний удирдлага
+* <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A">3B</a>
+* <a href="">F.ITA339</a> - Их өгөгдлийн аналитик
+* <a href="">F.ITM308</a> - Мэдээллийн баталгаажуулалт ба хамгаалалт
+* <a href="">F.ITA351</a> - Мэдээллийн технологийн төсөл I
+* <a href="">B.BAM304</a> - Төслийн менежмент
+* <a href="">F.NSM302</a> - Сүлжээний програмчлал
+* <a href="">F.ITM309</a> - Мэдээллийн хайлт
+* <a href="">F.ITM304</a> - Виртуал систем, сервис  | IOT
+* <a href="">F.ITA362</a> - Үйлдвэрлэлийн дадлага
   
 Надтай холбогдох
 ----------------
