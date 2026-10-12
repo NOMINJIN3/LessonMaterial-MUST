@@ -1,0 +1,6 @@
+I love this product, it's amazing! -> Sentiment: Positive
+Worst experience ever, totally disappointed. -> Sentiment: Negative
+The service was okay, nothing special. -> Sentiment: Neutral
+Absolutely fantastic! Highly recommend. -> Sentiment: Positive
+Not worth the price, I regret buying it. -> Sentiment: Negative
+Decent quality, but could be better. -> Sentiment: Neutral

@@ -1,0 +1,4 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "cmake.sourceDirectory": "/home/nominjin/3A/Mobile technology/Labs/Lab1/hello_flutter/linux"
+}

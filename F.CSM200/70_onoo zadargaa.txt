@@ -1,0 +1,21 @@
+AI
+
+70 онооны задаргаа
+- lab(13) = 26 onoo
+- Irts = 4 onoo
+- Biye daalt: 3(1,2,4) = 9 
+- Uuriiguu sorih test = 8
+- lect irts = 3
+- Mini project 3(1,2,3) = 9 -Labiin bagsh 
+- Soril 1,2 = 20 onoo
+
+
+Biye daalt(deadline)
+ 1 - Deadline 8
+ 2- Deadline 10
+ 4 - Deadline 12
+
+Mini projects
+ 1: 2-r 7 honogt baigaa 
+ 2: 7-r 7 honogt baigaa
+ 3:     7 honogt baigaa 
