@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <title>Саруулын 1-р цагийн хуваарь</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; max-width: 600px; }
+    th, td { border: 1px solid #444; padding: 8px; text-align: left; }
+    th { background:#f0f0f0; }
+    ul { margin: 0; padding-left: 20px; }
+  </style>
+</head>
+<body>
+
+  <h2>Саруул — 1-р цагийн хуваарь</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Өдөр</th>
+        <th>1-р цаг</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1-р өдөр</td>
+        <td>
+          <ul>
+            <li>Хичээл 1 (жишээ)</li>
+            <li>Хичээл 2 (жишээ)</li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td>2-р өдөр</td>
+        <td>Хичээл 1 (жишээ)</td>
+      </tr>
+      <tr>
+        <td>3-р өдөр</td>
+        <td>Хичээл 1 (жишээ)</td>
+      </tr>
+    </tbody>
+  </table>
+
+</body>
+</html>

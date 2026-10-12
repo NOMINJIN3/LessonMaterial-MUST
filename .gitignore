@@ -1,0 +1,39 @@
+# Big files
+*.zip
+*.rar
+*.7z
+
+
+# videos
+*.mp4
+*.mkv
+
+# java build
+*.class
+
+# node / system
+node_modules/
+.DS_Store
+
+# Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+
+# Android / Gradle
+.gradle/
+**/android/app/build/
+**/android/local.properties
+*.iml
+.idea/
+
+# iOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
+
+# OS
+.DS_Store
