@@ -47,14 +47,14 @@
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM311">F.ITM311</a> - Систетийн шинжилгээ ба зохиомж
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM309">F.ITM309</a> - Мобайл технологи
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A/F.ITM302">F.ITM302</a> - Систем ба сүлжээний удирдлага
-* <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3A">3B</a>
+* <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/3B">3B</a>
 * <a href="">F.ITA339</a> - Их өгөгдлийн аналитик
 * <a href="">F.ITM308</a> - Мэдээллийн баталгаажуулалт ба хамгаалалт
 * <a href="">F.ITA351</a> - Мэдээллийн технологийн төсөл I
 * <a href="">B.BAM304</a> - Төслийн менежмент
 * <a href="">F.NSM302</a> - Сүлжээний програмчлал
 * <a href="">F.ITM309</a> - Мэдээллийн хайлт
-* <a href="">F.ITM304</a> - Виртуал систем, сервис  | IOT
+* <a href="">F.ITM304</a> - Виртуал систем, сервис
 * <a href="">F.ITA362</a> - Үйлдвэрлэлийн дадлага
   
 Надтай холбогдох
