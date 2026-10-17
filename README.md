@@ -59,7 +59,6 @@
 * <a href="https://github.com/NOMINJIN3/LessonMaterial-MUST/tree/main/4A">4A</a>
 * <a href="">F.ITA303</a> - Мэдээллийн технологийн дэд бүтэц
 * <a href="">F.CNM310</a> - Холбооны ситем
-* <a href="">F.IT390</a> - Бакалаврын дипломын төсөл
 * <a href="">F.ITA371</a> - Бакалаврын дипломын төсөл
 * <a href="">F.ITA372</a> - Бакалаврын төгсөлтийн шалгалт
 * <a href="">F.ITA375</a> - Төгсөлтийн шалгалт
