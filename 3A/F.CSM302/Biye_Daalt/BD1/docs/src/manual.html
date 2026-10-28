@@ -1,0 +1,190 @@
+<!doctype html><html lang="mn"><head><meta charset="utf-8"><title>Manual</title><style>
+@page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+* { box-sizing: border-box; }
+body { font: 10.4pt/1.55 Inter, "DejaVu Sans", sans-serif; color: #1c1d21; margin: 0; }
+h1 { font-size: 19pt; margin: 0 0 4mm; letter-spacing: -.2px; }
+h2 { font-size: 13.5pt; margin: 8mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 1.5px solid #1c1d21; break-after: avoid; }
+h3 { font-size: 11pt; margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 2.6mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 6mm; } li { margin: .6mm 0; }
+table { border-collapse: collapse; width: 100%; margin: 2mm 0 4mm; font-size: 9pt; break-inside: auto; }
+th, td { border: 1px solid #c9c8c2; padding: 1.4mm 2mm; vertical-align: top; text-align: left; }
+th { background: #efeee9; font-weight: 600; }
+tr { break-inside: avoid; }
+.mono, code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.6pt; }
+.small { font-size: 8.4pt; }
+pre.code { font: 8.1pt/1.42 "DejaVu Sans Mono", monospace; background: #f5f4f0; border: 1px solid #dedcd5; border-left: 3px solid #2f5bd3;
+           padding: 2.5mm 3mm; white-space: pre-wrap; margin: 2mm 0 4mm; break-inside: avoid; }
+figure { margin: 3mm 0 5mm; break-inside: avoid; text-align: center; }
+figure img { border: 1px solid #dedcd5; max-width: 100%; }
+figcaption { font-size: 8.8pt; color: #555; margin-top: 1.5mm; }
+.pass { color: #1f8a4c; } .fail { color: #c8322b; }
+.box { border: 1px solid #c9c8c2; background: #faf9f6; padding: 3mm 4mm; margin: 3mm 0; break-inside: avoid; }
+.cover { height: 255mm; display: flex; flex-direction: column; break-after: page; }
+.cover .top { font-size: 10pt; color: #555; letter-spacing: .5px; }
+.cover .code { display: inline-block; font: 600 13pt "DejaVu Sans Mono", monospace; background: #1c1d21; color: #fff; padding: 1mm 3mm; border-radius: 1mm; margin: 40mm 0 5mm; }
+.cover h1 { font-size: 27pt; line-height: 1.15; margin-bottom: 3mm; }
+.cover .sub { font-size: 12.5pt; color: #333; }
+.cover .meta { margin-top: auto; }
+.cover table td:first-child { width: 42mm; font-weight: 600; background: #f5f4f0; }
+.toc li { margin: .8mm 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.kv td:first-child { width: 45mm; font-weight: 600; background: #f8f7f3; }
+.page-break { break-before: page; }
+svg text { font-family: Inter, "DejaVu Sans", sans-serif; }
+</style></head><body>
+<section class="cover" style="height:auto;min-height:120mm;break-after:auto">
+  <div class="top">F.CSM302 ҮЙЛДЛИЙН СИСТЕМ · БИЕ ДААЛТ 1 · MANUAL</div>
+  <div><span class="code" style="margin-top:10mm">IV-2-9</span></div>
+  <h1>Thread Pool — Worker Activity<br><span style="font-size:15pt;font-weight:500">Хэрэглэгчийн ба operational заавар</span></h1>
+  <table class="kv" style="margin-top:6mm">
+    <tr><td>Төсөл</td><td>Designing a Thread Pool (OSC Ch.7, Programming Project 1, POSIX)</td></tr>
+    <tr><td>Repository</td><td class="mono">https://github.com/<team>/IV-2-9-threadpool</td></tr>
+    <tr><td>Хувилбар</td><td>v1.0</td></tr>
+  </table>
+</section>
+
+<h2>Түргэн эхлэл (3 команд)</h2>
+<pre class="code">git clone &lt;REPO_URL&gt; &amp;&amp; cd IV-2-9-threadpool
+make &amp;&amp; make test        # → &quot;Нийт: 29 PASS, 0 FAIL&quot;
+make ui                  # → браузерт http://localhost:8000</pre>
+
+<h1 style="margin-top:8mm">8.1 Хэрэглэгчийн заавар</h1>
+
+<h2>1. Программын зорилго</h2>
+<p>Pthreads, mutex, semaphore-оор хэрэгжүүлсэн thread pool-ийг өөр өөр тохиргоогоор ажиллуулж, worker бүрийн <b>idle → running → completed</b> төлөв, task queue-ийн дүүргэлт, татгалзлыг хугацааны тэнхлэг дээр харуулна. UI дээрх бүх дүрслэл C программын бодит ажиллагааны бүртгэлээс (trace) зурагдана.</p>
+
+<h2>2. Дэмжих орчин</h2>
+<table class="kv"><tr><th>Зүйл</th><th>Шаардлага</th></tr><tr><td>OS</td><td>Linux (Ubuntu 20.04+, Debian, Fedora), Windows дээр WSL2. macOS-д build хийх боломжтой (Known issues-ийг үз)</td></tr><tr><td>Compiler</td><td>gcc ≥ 9 эсвэл clang ≥ 10 (C11, pthread)</td></tr><tr><td>Build</td><td>GNU make</td></tr><tr><td>UI</td><td>Python ≥ 3.8 (нэмэлт сан шаардахгүй) + орчин үеийн браузер (Chrome, Firefox, Edge, Safari)</td></tr></table>
+
+<h2>3. Суулгах эсвэл нээх алхам</h2>
+<ol>
+<li>Repository-г татах: <code>git clone &lt;REPO_URL&gt;</code> (эсвэл ZIP татаж задлах).</li>
+<li>Хавтас руу орох: <code>cd IV-2-9-threadpool</code>.</li>
+<li>Хөрвүүлэх: <code>make</code> → <code>build/threadpool_sim</code>, <code>build/client</code> үүснэ.</li>
+<li>UI-г эхлүүлэх: <code>make ui</code> (эсвэл <code>python3 tools/server.py --port 8000</code>).</li>
+<li>Браузерт <code>http://localhost:8000</code> нээнэ. Баруун дээд буланд ногоон цэг ба “C программтай холбогдсон” гэж гарвал бэлэн.</li>
+</ol>
+<div class="box"><b>Сервергүй үзэх:</b> <code>ui/index.html</code>-ийг шууд нээгээд “Trace ачаалах” → <code>examples/sample_trace.json</code>. Энэ горимд “Ажиллуулах” идэвхгүй, хадгалсан trace-ийг л үзнэ.</div>
+
+<h2>4. Оролт ба тохиргоо</h2>
+<h3>4.1 UI-ийн талбарууд</h3>
+<table class=""><tr><th>Талбар</th><th>Утга</th><th>Тайлбар</th></tr><tr><td>Worker thread</td><td>1–64</td><td>Pool дахь worker thread-ийн тоо</td></tr><tr><td>Queue багтаамж</td><td>1–4096</td><td>Тойрог массив queue-ийн хэмжээ (номын анхдагч 10)</td></tr><tr><td>Дүүрэх үед</td><td>reject / retry</td><td>reject: номын дагуу <code>pool_submit</code> 1 буцааж task хаягдана. retry: client “Retry зай” ms хүлээгээд дахин оролдоно</td></tr><tr><td>Retry зай, ms</td><td>1–10000</td><td>Зөвхөн retry горимд</td></tr><tr><td>Параметрээр → Task-ийн тоо</td><td>1–2000</td><td>Үүсгэх task-ийн тоо</td></tr><tr><td>Хугацаа, ms (min–max)</td><td>1–60000</td><td>Task бүрийн ажиллах хугацаа энэ мужаас санамсаргүй</td></tr><tr><td>Ирэх зай, ms (min–max)</td><td>0–60000</td><td>Дараалсан хоёр task-ийн хоорондох зай; 0 = бүгд зэрэг</td></tr><tr><td>Seed</td><td>≥ 0</td><td>Ижил seed → ижил ачаалал (дахин давтах боломжтой)</td></tr><tr><td>Task жагсаалт</td><td>мөр бүр <code>arrival_ms duration_ms</code></td><td>Тодорхой сценари. <code>#</code>-ээс хойш тайлбар. arrival өсөх дарааллаар. “Бэлэн тест”-ээс сонгож засаж болно</td></tr></table>
+<h3>4.2 Командын мөрийн сонголтууд</h3>
+<pre class="code">Хэрэглээ: ./build/threadpool_sim [сонголтууд]
+  -w N        worker thread-ийн тоо (1..64, анхдагч 3)
+  -q N        queue-ийн багтаамж (1..4096, анхдагч 10)
+  -n N        task-ийн тоо (1..10000, анхдагч 12)
+  -d A[-B]    task-ийн хугацаа ms (1..60000, анхдагч 200-800)
+  -a A[-B]    дараалсан task-уудын ирэх зай ms (0..60000, анхдагч 50-150)
+  -f FILE     task-ийн файл: мөр бүр &#x27;arrival_ms duration_ms&#x27; (-n -d -a-г орлоно)
+  -p POLICY   queue дүүрэх үед: reject (номын дагуу 1 буцааж хаяна) | retry
+  -r MS       retry хоорондын зай ms (1..10000, анхдагч 20)
+  -s SEED     санамсаргүй тооны seed (анхдагч 42)
+  -o FILE     JSON trace бичих файл (&#x27;-&#x27; бол stdout)
+  -v          task бүрийг stderr-д хэвлэх
+  -h          энэ тусламж
+Жишээ: ./build/threadpool_sim -w 3 -q 5 -n 20 -d 100-400 -a 20-60 -o trace.json</pre>
+
+<h2>5. Ажиллуулах, зогсоох, reset хийх</h2>
+<table class=""><tr><th>Үйлдэл</th><th>UI</th><th>Товчлуур</th></tr><tr><td>Ажиллуулах</td><td><b>▶ Ажиллуулах</b> — C программ бодитоор ажиллана (task-уудын нийт хугацаа шиг удна), дараа нь автоматаар тоглуулна</td><td></td></tr><tr><td>Тоглуулах / түр зогсоох</td><td>▶ / ⏸</td><td>Space</td></tr><tr><td>Алхамчлах</td><td>◀︎ өмнөх, ▶︎ дараагийн үйл явдал</td><td>← / →</td></tr><tr><td>Хугацаанд очих</td><td>Гулсуур, timeline дээр дарах/чирэх, бүртгэлийн мөр дээр дарах</td><td></td></tr><tr><td>Хурд</td><td>0.25× … 10× (1× = бодит хугацаа)</td><td></td></tr><tr><td>Reset</td><td>⏮ — эхний агшинд буцна; “Анхдагч” — тохиргоог анхны утгад</td><td></td></tr><tr><td>Хадгалах / ачаалах</td><td>Trace хадгалах (JSON татна) / Trace ачаалах</td><td></td></tr><tr><td>Серверийг зогсоох</td><td>Терминалд <b>Ctrl+C</b></td><td></td></tr></table>
+
+<h2>6. Дүрслэлийн тэмдэг, өнгө, төлөв</h2>
+<figure><img src="../img/02_timeline_default.png" style="width:100%"><figcaption>Worker activity timeline</figcaption></figure>
+<table class=""><tr><th>Тэмдэг</th><th>Утга</th></tr><tr><td>Өнгөт bar <code>Tk</code> (worker lane)</td><td>Worker тухайн task-ийг <b>running</b> (execute) хийж буй хугацаа. Task бүр өөрийн өнгөтэй, queue-ийн slot-д ч мөн тэр өнгөөр харагдана</td></tr><tr><td>Судалтай саарал</td><td><b>idle</b> — worker <code>sem_wait</code> дээр ажил хүлээж байна</td></tr><tr><td>Хар/бараан бүс</td><td>Worker гарсан (<b>exited</b>) — shutdown-ы дараа</td></tr><tr><td>Ягаан step chart</td><td>Queue-ийн урт (0 … багтаамж)</td></tr><tr><td>client мөр: саарал |</td><td><code>pool_submit</code> амжилттай (0)</td></tr><tr><td>client мөр: улаан ✕</td><td>Queue дүүрсэн — <code>pool_submit</code> 1 буцаасан (REJECT)</td></tr><tr><td>Тасархай босоо зураас</td><td><code>pool_shutdown()</code> дуудагдсан агшин</td></tr><tr><td>Хар босоо шугам</td><td>Одоогийн агшин (playhead)</td></tr><tr><td>Worker карт: ● running Tk / ○ idle / ■ exited, ✓ n</td><td>t агшин дахь төлөв ба тухайн worker-ийн дуусгасан task-ийн тоо (completed)</td></tr><tr><td>VERIFY OK / FAIL</td><td>C программын 8 дотоод шалгалтын дүн</td></tr></table>
+
+<h2>7. Жишээ</h2>
+<h3>Жишээ 1 — Queue дүүрэх (reject)</h3>
+<ol><li>“Task жагсаалт” → Бэлэн тест: <code>burst.txt</code>.</li><li>Worker 2, Queue 3, Дүүрэх үед: reject → ▶ Ажиллуулах.</li><li><b>Хүлээгдэх:</b> 3–5 task хүлээн авагдаж, үлдсэн нь client мөрөнд улаан ✕ болно; “татгалзсан” ≥ 5; makespan ≈ 600 ms.</li></ol>
+<figure><img src="../img/03_burst_reject.png" style="width:88%"><figcaption>Жишээ 1-ийн үр дүн</figcaption></figure>
+<h3>Жишээ 2 — Retry горим</h3>
+<ol><li>Жишээ 1-ийн тохиргоонд “Дүүрэх үед: retry” болгоод ажиллуулна.</li><li><b>Хүлээгдэх:</b> 10/10 хүлээн авагдана, ✕ олон (дахин оролдлого), makespan ≈ 1500 ms.</li></ol>
+<h3>Жишээ 3 — Worker-ийн тооны нөлөө</h3>
+<ol><li>Параметрээр: Task 40, Хугацаа 100–300, Ирэх зай 0–0, Queue 64, Seed 1.</li><li>Worker 1, 2, 4, 8-аар ээлжлэн ажиллуулж “Makespan” ба “Worker ашиглалт”-ыг харьцуулна.</li><li><b>Хүлээгдэх:</b> makespan ≈ 8.4 с → 4.2 с → 2.2 с → 1.1 с.</li></ol>
+<h3>Жишээ 4 — FIFO-г алхамчилж шалгах</h3>
+<ol><li>Бэлэн тест <code>fifo.txt</code>, Worker 1 → Ажиллуулах → ⏮.</li><li>→ товчоор алхамчилна. <b>Хүлээгдэх:</b> START-ууд T0, T1, T2… дарааллаар.</li></ol>
+
+<h2>8. Түгээмэл алдаа ба шийдэл</h2>
+<table class=""><tr><th>Алдаа / шинж тэмдэг</th><th>Шалтгаан</th><th>Шийдэл</th></tr><tr><td>“offline — зөвхөн trace файл үзэх горим”</td><td>index.html-ийг файлаар нээсэн эсвэл сервер ажиллаагүй</td><td><code>make ui</code> ажиллуулаад <code>http://localhost:8000</code> нээнэ</td></tr><tr><td>“build/threadpool_sim алга”</td><td>Хөрвүүлээгүй</td><td><code>make</code></td></tr><tr><td><code>Address already in use</code></td><td>8000 порт завгүй</td><td><code>python3 tools/server.py --port 8080</code></td></tr><tr><td>“Алдаа: -w буруу ('0')…”</td><td>Утга хязгаараас гадуур</td><td>Мессежид заасан мужид оруулна</td></tr><tr><td>“&lt;task жагсаалт&gt;:2 — duration_ms буруу”</td><td>Жагсаалтын 2-р мөрөнд тоо биш утга</td><td>Мөр бүр яг 2 бүхэл тоо</td></tr><tr><td>“arrival_ms өсөхгүй дарааллаар”</td><td>Ирэх хугацаа эрэмбэгүй</td><td>arrival-аар эрэмбэлнэ</td></tr><tr><td>“Тооцоолсон хугацаа ~N сек”</td><td>UI-д нэг ажиллуулалт ~60 с-ээр хязгаарлагдсан</td><td>Task/хугацааг багасгах, worker нэмэх эсвэл CLI ашиглах</td></tr><tr><td>Ижил тохиргоо өөр timeline гаргах</td><td>OS scheduler-ийн жам ёсны nondeterminism</td><td>Алдаа биш. “Trace хадгалах”-аар тодорхой ажиллуулалтыг хадгална</td></tr></table>
+
+<h1 class="page-break">8.2 Operational заавар</h1>
+
+<h2>1. Repository clone хийх</h2>
+<pre class="code">git clone &lt;REPO_URL&gt;
+cd IV-2-9-threadpool
+git checkout v1.0          # 9-р долоо хоногт нийтэлсэн хувилбар</pre>
+
+<h2>2. OS, compiler/runtime, version</h2>
+<table class=""><tr><th>Зүйл</th><th>Туршсан хувилбар</th><th>Хамгийн бага</th></tr><tr><td>OS</td><td>Ubuntu 24.04.5 LTS, kernel 6.18.44-fc-v180</td><td></td></tr><tr><td>CPU</td><td>Intel(R) Xeon(R) Processor @ 2.30GHz, 2 core, x86_64</td><td>x86_64 / arm64</td></tr><tr><td>Compiler</td><td>gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0</td><td>gcc 9 / clang 10</td></tr><tr><td>libc / pthread</td><td>ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39</td><td>glibc 2.31</td></tr><tr><td>Python (UI сервер)</td><td>Python 3.13.18</td><td>Python 3.8</td></tr><tr><td>Браузер (UI, screenshot)</td><td>Chromium 153 (headless, playwright)</td><td>Орчин үеийн браузер</td></tr></table>
+
+<h2>3. Dependency суулгах</h2>
+<pre class="code"># Ubuntu / Debian / WSL2
+sudo apt update &amp;&amp; sudo apt install -y build-essential python3
+# Fedora
+sudo dnf install -y gcc make python3
+# macOS
+xcode-select --install</pre>
+<p>Python-д нэмэлт pip сан, UI-д CDN шаардахгүй.</p>
+
+<h2>4. Build ба Run команд</h2>
+<table class=""><tr><th>Команд</th><th>Үйлдэл</th></tr><tr><td><code>make</code></td><td><code>build/threadpool_sim</code>, <code>build/client</code> хөрвүүлнэ</td></tr><tr><td><code>make run</code></td><td>3 worker, queue 5, 15 task; trace → <code>build/trace.json</code></td></tr><tr><td><code>make client</code></td><td>Номын client.c жишээ</td></tr><tr><td><code>make test</code></td><td>Бүх тест (29)</td></tr><tr><td><code>make tsan</code></td><td>ThreadSanitizer-тэй build + ажиллуулалт</td></tr><tr><td><code>make ui</code></td><td>UI сервер, http://localhost:8000</td></tr><tr><td><code>sh tests/experiments.sh</code></td><td>Тайлангийн туршилтын хүснэгт → <code>docs/results/*.csv</code></td></tr><tr><td><code>python3 tools/build_docs.py</code></td><td>Report.pdf, Manual.pdf-ийг дахин үүсгэх (playwright шаардлагатай)</td></tr><tr><td><code>make clean</code></td><td>build/ устгана</td></tr></table>
+<p>Exit code: <b>0</b> — амжилттай, <b>2</b> — буруу оролт, <b>3</b> — ажиллах үеийн алдаа (санах ой, thread үүсгэх), <b>4</b> — дотоод шалгалт унасан.</p>
+
+<h2>5. Үндсэн тестийн өгөгдөл</h2>
+<table class=""><tr><th>Файл / команд</th><th>Агуулга</th><th>Хүлээгдсэн үр дүн</th></tr><tr><td><code>./build/client</code></td><td>Номын жишээ, 5 хос тоо</td><td><code>result = 15, 3, 300, 0, 42</code> (дараалал өөр байж болно)</td></tr><tr><td><code>-f tests/basic.txt</code></td><td>10 task, 0–350 ms-д ирнэ</td><td>accepted=10, rejected=0, max_running=3, VERIFY: OK</td></tr><tr><td><code>-w 2 -q 3 -f tests/burst.txt</code></td><td>10 × 300 ms, t=0</td><td>accepted 3–5, rejected 5–7</td></tr><tr><td><code>... -p retry</code></td><td>Дээрхтэй ижил</td><td>accepted=10, makespan ≈ 1500 ms</td></tr><tr><td><code>-w 1 -f tests/fifo.txt</code></td><td>6 task</td><td>START дараалал = T0…T5</td></tr><tr><td><code>-w 3 -f tests/mixed_long_short.txt</code></td><td>1 × 1500 ms + 7 × 100 ms</td><td>accepted=8, бусад worker богинуудыг гүйцэтгэнэ</td></tr></table>
+<p>Trace-ийг бие даан шалгах: <code>python3 tests/verify_trace.py build/trace.json --expect accepted=15</code>.</p>
+
+<h2>6. Нэмэлт boundary/error test</h2>
+<pre class="code">./build/threadpool_sim -w 1 -q 1 -n 6 -d 100 -a 0          # queue 1: татгалзал гарна
+./build/threadpool_sim -w 64 -q 64 -n 64 -d 50 -a 0       # дээд 64 worker
+./build/threadpool_sim -w 8 -q 16 -n 500 -d 1-3 -a 0 -p retry -r 1   # 500 task stress
+./build/threadpool_sim -w 0             # → Алдаа: -w буруу (&#x27;0&#x27;) ..., exit 2
+./build/threadpool_sim -d 500-100       # → MIN нь MAX-аас их байж болохгүй
+./build/threadpool_sim -f tests/bad_unsorted.txt   # → :2 — arrival_ms өсөхгүй дарааллаар</pre>
+
+<h2>7. Хүлээгдсэн үр дүн</h2>
+<p><code>make test</code>-ийн төгсгөлд <code>Нийт: 29 PASS, 0 FAIL</code> гарч, exit code 0 буцна. Ажиллуулалт бүрийн stderr-ийн төгсгөлд 8 мөр <code>[ OK ]</code> ба <code>VERIFY: OK</code> хэвлэгдэнэ. Хугацааны утгууд (wait, makespan) машин бүрт хэдэн ms-ээр зөрж болно. Хүлээн авсан/татгалзсан тоо, FIFO дараалал, зэрэгцээний дээд хэмжээ өөрчлөгдөхгүй (burst_reject-ийн 3–5 мужаас бусад).</p>
+<pre class="code">Үндсэн тестүүд ==
+[basic_default] ./build/threadpool_sim -f tests/basic.txt
+  accepted=10 rejected=0 max_running=3 max_queue=4 avg_wait=139.9ms util=91.7%
+  trace шалгалт: OK (48 үйл явдал)
+  PASS basic_default
+[burst_reject] ./build/threadpool_sim -w 2 -q 3 -f tests/burst.txt
+  accepted=3 rejected=7 max_running=2 max_queue=3 avg_wait=100.0ms util=75.0%
+  trace шалгалт: OK (25 үйл явдал)
+  PASS burst_reject
+[burst_retry] ./build/threadpool_sim -w 2 -q 3 -f tests/burst.txt -p retry -r 20
+  accepted=10 rejected=0 max_running=2 max_queue=3 avg_wait=324.5ms util=100.0%
+  trace шалгалт: OK (91 үйл явдал)
+  PASS burst_retry
+[fifo_one_worker] ./build/threadpool_sim -w 1 -f tests/fifo.txt
+  accepted=6 rejected=0 max_running=1 max_queue=5 avg_wait=164.4ms util=100.0%
+  trace шалгалт: OK (28 үйл явдал)
+  PASS fifo_one_worker
+[long_short_mix] ./build/threadpool_sim -w 3 -f tests/mixed_long_short.txt
+  accepted=8 rejected=0 max_running=3 max_queue=5 avg_wait=90.5ms util=49.0%
+  trace шалгалт: OK (40 үйл явдал)
+  PASS long_short_mix
+[random_seeded] ./build/threadpool_sim -w 4 -q 8 -n 20 -d 50-200 -a 10-40 -s 7
+  accepted=20 rejected=0 max_running=4 max_queue=5 avg_wait=66.7ms util=89.3%
+  trace шалгалт: OK (90 үйл явдал)
+  PASS random_seeded
+== 3. Boundary тестүүд ==
+[queue_cap_1] ./build/threadpool_sim -w 1 -q 1 -n 6 -d 100 -a 0
+  accepted=1 rejected=5 max_running=1 max_queue=1 avg_wait=0.0ms util=100.0%
+  trace шалгалт: OK (13 үйл явдал)
+  PASS queue_cap_1
+[more_workers] ./build/thread
+...</pre>
+
+<h2>8. Known issues</h2>
+<ul>
+<li><b>macOS:</b> unnamed POSIX semaphore (<code>sem_init</code>) дэмжигддэггүй тул <code>dispatch_semaphore</code> wrapper ашигладаг. Энэ замыг зөвхөн CI-д тохируулсан бөгөөд баг бүрэн туршаагүй.</li>
+<li><b>Windows (native):</b> дэмжихгүй. WSL2 ашиглана.</li>
+<li><b>Nondeterminism:</b> Worker-ийн хуваарилалт ба burst-ийн үеийн хүлээн авах тоо ажиллуулалт бүрт бага зэрэг өөр гарна (OS scheduler).</li>
+<li><b>UI хязгаар:</b> Нэг ажиллуулалт ≤ 2000 task, ≤ ~60 с. Илүүг CLI-ээр ажиллуулж, trace-ийг ачаалж үзнэ (их task-тай trace зурахад браузер удааширч болно).</li>
+<li><b>Retry горим:</b> Нэг client thread submit хийдэг тул retry хүлээлт дараагийн task-уудын ирэлтийг хойшлуулна.</li>
+<li><b>Маш богино task (&lt; 1 ms):</b> Trace-ийн mutex нэмэлт зардал үүсгэж, хэмжилтэд нөлөөлнө.</li>
+<li><b>Сервер:</b> Зөвхөн <code>127.0.0.1</code>-д сонсоно (аюулгүй байдлын үүднээс). Өөр машинаас хандахад <code>--host 0.0.0.0</code>.</li>
+</ul>
+</body></html>

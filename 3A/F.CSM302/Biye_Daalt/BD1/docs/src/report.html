@@ -1,0 +1,311 @@
+<!doctype html><html lang="mn"><head><meta charset="utf-8"><title>БД1 тайлан</title><style>
+@page { size: A4; margin: 18mm 17mm 18mm 17mm; }
+* { box-sizing: border-box; }
+body { font: 10.4pt/1.55 Inter, "DejaVu Sans", sans-serif; color: #1c1d21; margin: 0; }
+h1 { font-size: 19pt; margin: 0 0 4mm; letter-spacing: -.2px; }
+h2 { font-size: 13.5pt; margin: 8mm 0 3mm; padding-bottom: 1.5mm; border-bottom: 1.5px solid #1c1d21; break-after: avoid; }
+h3 { font-size: 11pt; margin: 5mm 0 2mm; break-after: avoid; }
+p { margin: 0 0 2.6mm; text-align: justify; }
+ul, ol { margin: 0 0 3mm; padding-left: 6mm; } li { margin: .6mm 0; }
+table { border-collapse: collapse; width: 100%; margin: 2mm 0 4mm; font-size: 9pt; break-inside: auto; }
+th, td { border: 1px solid #c9c8c2; padding: 1.4mm 2mm; vertical-align: top; text-align: left; }
+th { background: #efeee9; font-weight: 600; }
+tr { break-inside: avoid; }
+.mono, code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.6pt; }
+.small { font-size: 8.4pt; }
+pre.code { font: 8.1pt/1.42 "DejaVu Sans Mono", monospace; background: #f5f4f0; border: 1px solid #dedcd5; border-left: 3px solid #2f5bd3;
+           padding: 2.5mm 3mm; white-space: pre-wrap; margin: 2mm 0 4mm; break-inside: avoid; }
+figure { margin: 3mm 0 5mm; break-inside: avoid; text-align: center; }
+figure img { border: 1px solid #dedcd5; max-width: 100%; }
+figcaption { font-size: 8.8pt; color: #555; margin-top: 1.5mm; }
+.pass { color: #1f8a4c; } .fail { color: #c8322b; }
+.box { border: 1px solid #c9c8c2; background: #faf9f6; padding: 3mm 4mm; margin: 3mm 0; break-inside: avoid; }
+.cover { height: 255mm; display: flex; flex-direction: column; break-after: page; }
+.cover .top { font-size: 10pt; color: #555; letter-spacing: .5px; }
+.cover .code { display: inline-block; font: 600 13pt "DejaVu Sans Mono", monospace; background: #1c1d21; color: #fff; padding: 1mm 3mm; border-radius: 1mm; margin: 40mm 0 5mm; }
+.cover h1 { font-size: 27pt; line-height: 1.15; margin-bottom: 3mm; }
+.cover .sub { font-size: 12.5pt; color: #333; }
+.cover .meta { margin-top: auto; }
+.cover table td:first-child { width: 42mm; font-weight: 600; background: #f5f4f0; }
+.toc li { margin: .8mm 0; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+.kv td:first-child { width: 45mm; font-weight: 600; background: #f8f7f3; }
+.page-break { break-before: page; }
+svg text { font-family: Inter, "DejaVu Sans", sans-serif; }
+</style></head><body>
+<section class="cover">
+  <div class="top">F.CSM302 ҮЙЛДЛИЙН СИСТЕМ · БИЕ ДААЛТ 1 · СУДАЛГАА, ХЭРЭГЖИЛТ, ТУРШИЛТЫН ТАЙЛАН</div>
+  <div><span class="code">IV-2-9</span></div>
+  <h1>Designing a Thread Pool</h1>
+  <div class="sub">Pthreads, POSIX mutex ба semaphore ашигласан thread pool,<br>“Worker activity” interactive дүрслэлийн хамт</div>
+  <div class="meta">
+    <table class="kv">
+      <tr><td>Хичээл</td><td>F.CSM302 Үйлдлийн систем</td></tr>
+      <tr><td>Сурах бичиг</td><td>Operating System Concepts (2018), 7-р бүлэг “Synchronization Examples”, Programming Project 1</td></tr>
+      <tr><td>Хуваарилалтын код</td><td>IV-2-9 — IV өдөр, 2-р цаг, 9-р сэдэв</td></tr>
+      <tr><td>UI дүрслэл</td><td>Worker activity</td></tr>
+      <tr><td>Repository</td><td class="mono">https://github.com/<team>/IV-2-9-threadpool</td></tr>
+      <tr><td>Шүүмжлэх баг</td><td>II-4-2 (Linux Kernel Module for Task Information)</td></tr>
+      <tr><td>Огноо</td><td>2026 оны 11-р сар</td></tr>
+    </table>
+    <table class=""><tr><th>Гишүүн</th><th>Оюутны код</th><th>Хариуцсан ажил</th></tr><tr><td>[Гишүүн 1 нэр]</td><td>[B2xxxxxxx]</td><td>Thread pool цөм (src/threadpool.c), mutex/semaphore</td></tr><tr><td>[Гишүүн 2 нэр]</td><td>[B2xxxxxxx]</td><td>Туршилтын программ (src/main.c), тест</td></tr><tr><td>[Гишүүн 3 нэр]</td><td>[B2xxxxxxx]</td><td>Interactive UI, сервер, тайлан</td></tr></table>
+  </div>
+</section>
+
+<h2>Хураангуй</h2>
+<p><b>Асуудал.</b> Хүсэлт бүрт шинэ thread үүсгэх нь үүсгэх/устгах зардалтай. Мөн нэгэн зэрэг ажиллах thread-ийн тоог хязгаарладаггүй. Thread pool нь цөөн тооны worker thread-ийг урьдчилан үүсгэж, ажлыг хуваалцсан queue-ээр дамжуулан хуваарилна. Энэ үед queue руу олон thread зэрэг хандах тул race condition үүсэх аюултай. Мөн ажилгүй worker-уудыг CPU үрэхгүйгээр хүлээлгэх шаардлагатай.</p>
+<p><b>Шийдэл.</b> Номын POSIX хувилбарын API-г (<code>pool_init</code>, <code>pool_submit</code>, <code>pool_shutdown</code>) C хэл дээр хэрэгжүүлсэн. Queue нь тойрог массив бөгөөд <code>pthread_mutex</code>-ээр хамгаалагдсан. Worker-ууд <code>sem_wait</code> дээр блоклогдон хүлээж, task орж ирэхэд <code>sem_post</code>-оор сэрнэ. Программ бүх үйл явдлыг микросекундын нарийвчлалтай бүртгэж JSON trace гаргана. Interactive UI нь энэ trace-ээр worker бүрийн idle/running/completed төлөв, queue-ийн дүүргэлт, татгалзлыг хугацааны тэнхлэг дээр алхамчлан харуулна. UI-ийн “Ажиллуулах” товч C программыг бодитоор ажиллуулдаг.</p>
+<p><b>Туршилт ба үр дүн.</b> 29 автомат тест бүгд амжилттай (0 алдаа). Үүнд номын <code>client.c</code> жишээ, үндсэн 6, захын 5, буруу оролтын 17 тест багтана. Тест бүрийн trace-ийг C кодоос хамааралгүй Python шалгагчаар дахин шалгасан. Шалгасан шинжүүд: task бүр яг 1 удаа ажилласан, нэг worker давхар ажил аваагүй, queue FIFO дарааллаар ажилласан, багтаамжаас хэтрээгүй. ThreadSanitizer race condition илрүүлээгүй. 40 task-ийн ачаалалд worker-ийн тоог 1→16 болгоход makespan 8373 ms-ээс 646 ms болж буурсан (13.0× хурдатгал).</p>
+
+<h2>Агуулга</h2>
+<ol class="toc"><li>Удиртгал</li><li>Сурах бичгийн шаардлага</li><li>Онолын үндэс</li><li>Системийн зохиомж</li><li>Хэрэгжилт</li><li>Туршилт ба UI дүрслэл</li><li>Туршилтын арга</li><li>Үр дүн</li><li>Хэлэлцүүлэг</li><li>Дүгнэлт</li><li>GitHub дээрх ажиллагаа, AI ашиглалт</li><li>Ашигласан материал · Хавсралт A</li></ol>
+
+<h2>1. Удиртгал</h2>
+<p><b>Зорилго.</b> Сурах бичгийн 7-р бүлгийн Programming Project 1-ийн POSIX хувилбарыг бүрэн хэрэгжүүлэх. Worker-ийн тоо, queue-ийн багтаамж, ачааллыг өөрчилж турших боломжтой программ бүтээх. Thread pool-ийн ажиллагааг “Worker activity” дүрслэлээр нотлох.</p>
+<p><b>Ач холбогдол.</b> Thread pool нь вэб сервер, өгөгдлийн сан, Java <code>ExecutorService</code>, Linux kernel-ийн <code>workqueue</code> зэрэг олон системийн үндэс юм. Энэ төсөл нь 6–7-р бүлгийн mutex, semaphore, bounded buffer (producer–consumer) ойлголтуудыг бодит программд нэгтгэж харуулна. Pool-д task өгөгч thread нь producer, worker-ууд нь consumer болно.</p>
+<p><b>Хамрах хүрээ.</b> Хамарсан: Linux дээрх POSIX хувилбар, номын API, массиваар хэрэгжүүлсэн queue, тохируулах параметр, trace, тест, interactive UI. Хамаараагүй: Java хувилбар (номонд сонголтоор өгсөн), task-ийн priority, worker-ийн тоог динамикаар өөрчлөх.</p>
+
+<h2>2. Сурах бичгийн шаардлага</h2>
+<p>Номын Project 1 (P-35…P-38) дахь POSIX хувилбарын шаардлага ба хэрэгжүүлэлтийн харгалзаа:</p>
+<table class=""><tr><th>#</th><th>Номын шаардлага</th><th>Хэрэгжүүлэлт</th><th>Нотолгоо</th></tr><tr><td>1</td><td><code>pool_init()</code> нь thread-үүдийг эхэнд үүсгэж, mutex ба semaphore-ийг эхлүүлнэ</td><td><code>pool_init()</code> (3 worker, queue 10) ба <code>pool_init_ex(n, cap)</code></td><td>POOL_INIT, IDLE үйл явдал; book_client тест</td></tr><tr><td>2</td><td><code>pool_submit()</code> task struct-ийг <code>enqueue()</code>-ээр queue-д хийнэ; worker <code>dequeue()</code> хийнэ</td><td><code>task {{function, data, id}}</code>, тойрог массив <code>enqueue/dequeue</code></td><td>SUBMIT/START, FIFO шалгалт</td></tr><tr><td>3</td><td>Массив queue дүүрсэн бол 1 буцаана, бусад үед 0</td><td><code>POOL_FULL=1</code>, <code>POOL_OK=0</code> (+ <code>POOL_ERR=2</code> shutdown-ы дараа)</td><td>burst_reject, queue_cap_1</td></tr><tr><td>4</td><td><code>worker()</code> ажил хүлээж, авснаа <code>execute()</code>-ээр ажиллуулна; мэдэгдэлд semaphore</td><td><code>sem_t work_available</code>; <code>sem_wait</code> → dequeue → <code>execute()</code></td><td>worker_exclusive шалгалт</td></tr><tr><td>5</td><td>Queue-д хандахад mutex заавал</td><td><code>pthread_mutex_t qmutex</code></td><td>ThreadSanitizer: 0 race</td></tr><tr><td>6</td><td><code>pool_shutdown()</code> worker-уудыг зогсоож <code>pthread_join()</code> хийнэ; бүх task дууссаны дараа</td><td>shutdown флаг + N удаа <code>sem_post</code> → үлдсэн task-уудыг гүйцээгээд гарна → <code>pthread_join</code></td><td>SHUTDOWN → WORKER_EXIT, counts_consistent</td></tr><tr><td>7</td><td>Номын <code>client.c</code> жишээ ажиллана</td><td><code>examples/client.c</code> — 5 нийлбэр</td><td>book_client: PASS</td></tr></table>
+<p>Хуваарилалтын файлын 9-р сэдвийн хүрэх үр дүн: <i>“Worker-ийн тоо, task queue, ажлын параметрийг өөрчилж, worker бүрийн idle, running, completed төлөвийг хугацааны явцад харуулна.”</i> Үүнийг 6-р хэсэгт тайлбарласан UI хангана.</p>
+
+<h2>3. Онолын үндэс</h2>
+<h3>3.1 Thread pool (номын 4.5.1)</h3>
+<p>Pool эхлэхдээ тогтмол тооны thread үүсгэнэ. Ирсэн ажил queue-д ордог бөгөөд чөлөөтэй thread түүнийг авч гүйцэтгэнэ. Давуу тал нь гурав. Нэгдүгээрт, байгаа thread-ээр үйлчлэх нь шинэ thread үүсгэхээс хурдан. Хоёрдугаарт, нэгэн зэрэг ажиллах thread-ийн тоо хязгаарлагдмал тул систем хэт ачаалагдахгүй. Гуравдугаарт, ажлыг ажиллуулах механизмаас тусгаарласан тул хуваарилах стратегийг тусад нь өөрчилж болно.</p>
+<h3>3.2 Mutex lock (номын 6.5, 7.3.1)</h3>
+<p>Queue-ийн <code>head</code>, <code>tail</code>, <code>count</code> хувьсагчдыг хэд хэдэн thread зэрэг өөрчилбөл race condition үүснэ. Жишээлбэл хоёр worker нэг task-ийг зэрэг dequeue хийж болно. <code>pthread_mutex_lock/unlock</code> нь энэ critical section-д нэг удаад нэг л thread орохыг баталгаажуулна.</p>
+<h3>3.3 Semaphore (номын 6.6, 7.3.2)</h3>
+<p>Тоолдог semaphore-ийн утга нь queue дахь task-ийн тоотой тэнцүү. <code>sem_wait()</code> утга 0 бол thread-ийг <b>блоклоно</b>, өөрөөр хэлбэл busy-wait хийхгүй. Утга 0-ээс их бол утгыг 1-ээр бууруулна. <code>sem_post()</code> утгыг нэмэгдүүлж, хүлээж буй нэг thread-ийг сэрээнэ. Номд unnamed semaphore (<code>sem_init(&amp;sem, 0, 0)</code>) ашиглахыг зөвлөсөн: <code>pshared=0</code> бол зөвхөн нэг процессын thread-үүд хуваалцана.</p>
+<h3>3.4 Bounded buffer-тэй холбоо (номын 7.1.1)</h3>
+<p>Thread pool-ийн queue бол bounded-buffer бодлогын нэг хэлбэр. Номын шийдэлд <code>empty</code>, <code>full</code>, <code>mutex</code> гэсэн гурван semaphore бий. Thread pool-д <code>full</code>-ийн үүргийг <code>work_available</code> гүйцэтгэнэ. <code>empty</code>-ийн оронд дүүрсэн queue-д producer-ийг блоклохгүйгээр шууд 1 буцаадаг. Энэ нь номын <code>pool_submit()</code>-ийн тодорхойлолт юм. <code>retry</code> горимд client өөрөө хүлээгээд дахин оролдоно.</p>
+<h3>3.5 Thread-ийг зогсоох (номын 4.6.3)</h3>
+<p>Номд <code>pthread_cancel()</code>-ийг санал болгосон: <code>sem_wait()</code> бол cancellation point. Гэвч deferred cancellation нь task ажиллаж байх үед <code>nanosleep</code> гэх мэт cancellation point дээр thread-ийг таслах боломжтой. Ингэвэл task дутуу үлдэж, түүний барьсан нөөц суллагдахгүй байж болно. Тиймээс бид “хамтран зогсох” (cooperative) аргыг сонгосон. Энэ нь “бүх task дууссаны дараа зогсоно” гэсэн API-ийн тайлбартай нийцнэ (5.4-т дэлгэрэнгүй).</p>
+
+<h2>4. Системийн зохиомж</h2>
+<h3>4.1 Компонентууд ба өгөгдлийн урсгал</h3>
+<figure><svg viewBox="0 0 680 250" width="100%" xmlns="http://www.w3.org/2000/svg" font-size="11">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#333"/></marker></defs>
+<rect x="10" y="20" width="150" height="80" rx="6" fill="#eef2fd" stroke="#2f5bd3"/><text x="85" y="45" text-anchor="middle" font-weight="600">ui/index.html</text><text x="85" y="62" text-anchor="middle">параметр, Run/Reset</text><text x="85" y="78" text-anchor="middle">timeline, playback</text>
+<rect x="250" y="20" width="160" height="80" rx="6" fill="#f3f0ff" stroke="#7a5af5"/><text x="330" y="45" text-anchor="middle" font-weight="600">tools/server.py</text><text x="330" y="62" text-anchor="middle">POST /api/run</text><text x="330" y="78" text-anchor="middle">subprocess → бинар</text>
+<rect x="500" y="10" width="170" height="230" rx="6" fill="#f5f4f0" stroke="#333"/><text x="585" y="30" text-anchor="middle" font-weight="600">build/threadpool_sim</text>
+<rect x="515" y="42" width="140" height="44" rx="4" fill="#fff" stroke="#888"/><text x="585" y="60" text-anchor="middle">main.c (client)</text><text x="585" y="76" text-anchor="middle" font-size="10">task үүсгэх, submit</text>
+<rect x="515" y="100" width="140" height="70" rx="4" fill="#fff" stroke="#888"/><text x="585" y="118" text-anchor="middle">threadpool.c</text><text x="585" y="134" text-anchor="middle" font-size="10">queue + qmutex</text><text x="585" y="148" text-anchor="middle" font-size="10">sem work_available</text><text x="585" y="162" text-anchor="middle" font-size="10">N worker thread</text>
+<rect x="515" y="184" width="140" height="44" rx="4" fill="#fff" stroke="#888"/><text x="585" y="202" text-anchor="middle">trace + шалгалт</text><text x="585" y="218" text-anchor="middle" font-size="10">JSON → stdout</text>
+<line x1="585" y1="86" x2="585" y2="100" stroke="#333" marker-end="url(#a)"/><line x1="585" y1="170" x2="585" y2="184" stroke="#333" marker-end="url(#a)"/>
+<line x1="160" y1="50" x2="250" y2="50" stroke="#333" marker-end="url(#a)"/><text x="205" y="44" text-anchor="middle" font-size="10">JSON параметр</text>
+<line x1="410" y1="50" x2="515" y2="60" stroke="#333" marker-end="url(#a)"/><text x="460" y="44" text-anchor="middle" font-size="10">-w -q -n -d -a -f</text>
+<path d="M515 210 L460 210 L460 85 L410 85" fill="none" stroke="#333" marker-end="url(#a)"/><text x="455" y="160" text-anchor="end" font-size="10">trace JSON</text>
+<line x1="250" y1="85" x2="160" y2="85" stroke="#333" marker-end="url(#a)"/><text x="205" y="98" text-anchor="middle" font-size="10">trace + stderr</text>
+<rect x="10" y="150" width="150" height="60" rx="6" fill="#fff" stroke="#888" stroke-dasharray="4 3"/><text x="85" y="172" text-anchor="middle" font-weight="600">examples/*.json</text><text x="85" y="190" text-anchor="middle">offline trace ачаалах</text>
+<line x1="85" y1="150" x2="85" y2="100" stroke="#333" stroke-dasharray="4 3" marker-end="url(#a)"/>
+</svg><figcaption>Зураг 1. Компонентууд: UI ↔ сервер ↔ C программ. Trace нь дүрслэлийн цорын ганц эх сурвалж.</figcaption></figure>
+<table class=""><tr><th>Компонент</th><th>Хэл</th><th>Үүрэг</th></tr><tr><td><code>src/threadpool.c/.h</code></td><td>C11, Pthreads</td><td>Thread pool цөм: queue, mutex, semaphore, worker, shutdown, trace бүртгэл</td></tr><tr><td><code>src/main.c</code></td><td>C11</td><td>Туршилтын client: CLI параметр/файл уншиж шалгах, task үүсгэх, хугацаанд нь submit хийх, үр дүнг тооцох, 8 инвариант шалгах, JSON гаргах</td></tr><tr><td><code>examples/client.c</code></td><td>C11</td><td>Номын client.c жишээ — API-г өөрчлөлтгүй ашиглана</td></tr><tr><td><code>tools/server.py</code></td><td>Python 3 stdlib</td><td>UI-ийн параметрийг CLI аргумент болгож бинарыг ажиллуулна; алдааг дамжуулна</td></tr><tr><td><code>ui/index.html</code></td><td>HTML/CSS/JS</td><td>Worker activity дүрслэл, playback, бүртгэл; гадны сангүй, offline горимтой</td></tr><tr><td><code>tests/</code></td><td>sh, Python</td><td>Тестийн өгөгдөл, тест ажиллуулагч, хараат бус trace шалгагч, туршилтын скрипт</td></tr></table>
+<h3>4.2 Pool доторх урсгал</h3>
+<figure><svg viewBox="0 0 680 230" width="100%" xmlns="http://www.w3.org/2000/svg" font-size="11">
+<defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#333"/></marker></defs>
+<rect x="10" y="80" width="120" height="60" rx="6" fill="#fff" stroke="#333"/><text x="70" y="103" text-anchor="middle" font-weight="600">pool_submit()</text><text x="70" y="120" text-anchor="middle" font-size="10">lock → enqueue</text><text x="70" y="133" text-anchor="middle" font-size="10">unlock → sem_post</text>
+<rect x="190" y="70" width="230" height="80" rx="6" fill="#f3f0ff" stroke="#7a5af5"/><text x="305" y="64" text-anchor="middle" font-weight="600">Тойрог queue [cap] — qmutex хамгаална</text>
+<g font-family="DejaVu Sans Mono" font-size="11"><rect x="205" y="92" width="38" height="36" fill="#7a5af5" opacity=".75"/><text x="224" y="115" text-anchor="middle" fill="#fff">T3</text><rect x="247" y="92" width="38" height="36" fill="#7a5af5" opacity=".75"/><text x="266" y="115" text-anchor="middle" fill="#fff">T4</text><rect x="289" y="92" width="38" height="36" fill="#7a5af5" opacity=".75"/><text x="308" y="115" text-anchor="middle" fill="#fff">T5</text><rect x="331" y="92" width="38" height="36" fill="none" stroke="#aaa" stroke-dasharray="3 2"/><rect x="373" y="92" width="38" height="36" fill="none" stroke="#aaa" stroke-dasharray="3 2"/></g>
+<text x="224" y="142" text-anchor="middle" font-size="9">head</text><text x="350" y="142" text-anchor="middle" font-size="9">tail</text>
+<line x1="130" y1="110" x2="190" y2="110" stroke="#333" marker-end="url(#b)"/>
+<rect x="250" y="175" width="110" height="40" rx="20" fill="#fff6e5" stroke="#b7791f"/><text x="305" y="192" text-anchor="middle" font-weight="600">sem work_available</text><text x="305" y="206" text-anchor="middle" font-size="10">= queue дахь task-ийн тоо</text>
+<path d="M70 140 L70 195 L250 195" fill="none" stroke="#b7791f" stroke-dasharray="4 3" marker-end="url(#b)"/><text x="150" y="190" font-size="10" fill="#b7791f">sem_post</text>
+<g><rect x="490" y="20" width="180" height="50" rx="6" fill="#eef2fd" stroke="#2f5bd3"/><text x="580" y="40" text-anchor="middle" font-weight="600">worker 0</text><text x="580" y="57" text-anchor="middle" font-size="10">sem_wait → dequeue → execute</text>
+<rect x="490" y="85" width="180" height="50" rx="6" fill="#eef2fd" stroke="#2f5bd3"/><text x="580" y="105" text-anchor="middle" font-weight="600">worker 1</text><text x="580" y="122" text-anchor="middle" font-size="10">running T2 (mutex-ээс гадна)</text>
+<rect x="490" y="150" width="180" height="50" rx="6" fill="#f5f4f0" stroke="#888"/><text x="580" y="170" text-anchor="middle" font-weight="600">worker N-1</text><text x="580" y="187" text-anchor="middle" font-size="10">idle: sem_wait дээр блоклогдсон</text></g>
+<line x1="420" y1="100" x2="490" y2="48" stroke="#333" marker-end="url(#b)"/><text x="455" y="68" font-size="10">dequeue</text>
+<path d="M360 195 L470 195 L490 180" fill="none" stroke="#b7791f" stroke-dasharray="4 3" marker-end="url(#b)"/><text x="420" y="212" font-size="10" fill="#b7791f">сэрээнэ</text>
+</svg><figcaption>Зураг 2. Submit → queue → semaphore → worker. Task-ийг mutex-ийн гадна ажиллуулдаг тул worker-ууд зэрэгцэн ажиллана.</figcaption></figure>
+<h3>4.3 Өгөгдлийн бүтэц</h3>
+<pre class="code">typedef struct { void (*function)(void *p); void *data; int id; } task;
+static task *queue;  static int qcap, qhead, qtail, qcount;   /* тойрог массив */
+static pthread_mutex_t qmutex;          /* queue + тоолуурыг хамгаална */
+static sem_t           work_available;  /* queue дахь task-ийн тоо     */
+typedef struct { long long t_us; pool_event_type type; int worker, task, qlen; } pool_event;</pre>
+<h3>4.4 Trace-ийн формат</h3>
+<p>Үйл явдал бүр <code>{t, type, w, task, q}</code> бүтэцтэй. <code>t</code> нь <code>pool_init</code>-ээс хойшх микросекунд, <code>q</code> нь үйл явдлын дараах queue-ийн урт. Төрлүүд: <code>POOL_INIT, IDLE, SUBMIT, REJECT, START, END, SHUTDOWN, WORKER_EXIT</code>. Цагийг trace-ийн mutex дотор авдаг тул массивын дараалал хугацааны дараалалтай давхцана. <code>SUBMIT</code> ба <code>START</code>-ийг queue-ийн mutex дор бүртгэдэг тул бүртгэсэн <code>q</code> нь бодит queue-ийн урттай яг тэнцүү.</p>
+
+<h2>5. Хэрэгжилт</h2>
+<h3>5.1 Хэл, сан, орчин</h3>
+<p>Цөм нь C11 дээр бичигдсэн бөгөөд зөвхөн libc ба <code>pthread</code> ашиглана. Build-ийг <code>make</code>, compiler-ийг <code>gcc -std=c11 -Wall -Wextra -O2</code> гүйцэтгэнэ. Сервер нь Python 3-ийн стандарт сантай (<code>http.server</code>, <code>subprocess</code>), UI нь цэвэр JavaScript ба SVG. macOS unnamed semaphore-ийг дэмждэггүй тул тэнд <code>dispatch_semaphore</code>-тэй жижиг wrapper ашиглана. Linux дээр жинхэнэ POSIX <code>sem_init/sem_wait/sem_post</code> ажиллана.</p>
+<h3>5.2 Worker функц</h3>
+<pre class="code">static void *worker(void *param)
+{
+    worker_info *me = param;
+
+    for (;;) {
+        trace(EV_WORKER_IDLE, me-&gt;id, -1, -1);
+        psem_wait(&amp;work_available);           /* ажил (эсвэл shutdown) хүлээнэ */
+
+        pthread_mutex_lock(&amp;qmutex);
+        if (qcount == 0 &amp;&amp; shutting_down) {   /* queue хоосон + shutdown → гарна */
+            pthread_mutex_unlock(&amp;qmutex);
+            break;
+        }
+        task t = dequeue();
+        trace(EV_START, me-&gt;id, t.id, qcount);
+        pthread_mutex_unlock(&amp;qmutex);
+
+        execute(t.function, t.data);          /* critical section-оос ГАДНА */
+
+        pthread_mutex_lock(&amp;qmutex);
+        completed++;
+        per_worker_completed[me-&gt;id]++;
+        trace(EV_END, me-&gt;id, t.id, qcount);
+        pthread_mutex_unlock(&amp;qmutex);
+    }
+
+    trace(EV_WORKER_EXIT, me-&gt;id, -1, -1);
+    return NULL;
+}</pre>
+<p>Гол шийдлүүд: (1) <code>sem_wait</code> нь mutex-ээс <i>гадна</i> байна. Mutex барьсан чигээрээ блоклогдвол бусад thread submit хийж чадахгүй тул deadlock болно. (2) <code>execute()</code>-ийг mutex-ийг суллаад ажиллуулна. Тэгэхгүй бол worker-ууд дараалж ажиллан pool утгагүй болно. (3) <code>sem_wait</code>-ийг <code>EINTR</code>-д давтана.</p>
+<h3>5.3 Submit</h3>
+<pre class="code">int pool_submit_id(void (*somefunction)(void *p), void *p, int task_id)
+{
+    if (!somefunction) return POOL_ERR;
+
+    pthread_mutex_lock(&amp;qmutex);
+    if (!initialized || shutting_down) { pthread_mutex_unlock(&amp;qmutex); return POOL_ERR; }
+    if (task_id &lt; 0) task_id = next_auto_id++;
+
+    task t = { somefunction, p, task_id };
+    if (enqueue(t) != 0) {
+        rejected++;
+        trace(EV_REJECT, -1, task_id, qcount);
+        pthread_mutex_unlock(&amp;qmutex);
+        return POOL_FULL;
+    }
+    submitted++;
+    trace(EV_SUBMIT, -1, task_id, qcount);
+    pthread_mutex_unlock(&amp;qmutex);
+
+    psem_post(&amp;work_available);   /* хүлээж буй нэг worker-ийг сэрээнэ */
+    return POOL_OK;
+}</pre>
+<p><code>sem_post</code>-ийг mutex суллагдсаны дараа дууддаг. Ингэснээр сэрсэн worker тэр даруй mutex-ийг авах боломжтой. Task queue-д орсон тохиолдолд л post хийдэг тул semaphore-ийн утга queue-ийн уртаас хэзээ ч их болохгүй.</p>
+<h3>5.4 Shutdown</h3>
+<pre class="code">void pool_shutdown(void)
+{
+    pthread_mutex_lock(&amp;qmutex);
+    if (!initialized || shutting_down) { pthread_mutex_unlock(&amp;qmutex); return; }
+    shutting_down = 1;
+    trace(EV_SHUTDOWN, -1, -1, qcount);
+    pthread_mutex_unlock(&amp;qmutex);
+
+    /* Worker бүрт нэг &quot;гарах&quot; дохио. Queue-д үлдсэн task бүр өөрийн post-той тул
+     * worker-ууд эхлээд бүх task-ийг гүйцээж, дараа нь л гарна. */
+    for (int i = 0; i &lt; nthreads; i++) psem_post(&amp;work_available);
+    for (int i = 0; i &lt; nthreads; i++) pthread_join(workers[i].tid, NULL);
+
+    pthread_mutex_lock(&amp;qmutex);
+    psem_destroy(&amp;work_available);
+    free(queue); queue = NULL;
+    initialized = 0;
+    pthread_mutex_unlock(&amp;qmutex);
+}</pre>
+<p><b>Зөв байдлын тайлбар.</b> Shutdown-ы өмнө queue-д <i>k</i> task байлаа гэж үзье. Semaphore-ийн утга <i>k + N</i> болно (task тус бүрийн post + worker тус бүрт нэг гарах дохио). Worker queue хоосон байхад л гардаг тул эхний <i>k</i> удаа сэрэхдээ task авна. Үлдсэн <i>N</i> удаагийн сэрэлт нь worker бүрийг нэг удаа гаргана. Тиймээс бүх task гүйцэтгэгдэж, бүх worker гарч, <code>pthread_join</code> блоклогдож үлдэхгүй. <code>counts_consistent</code> шалгалт (submitted = completed) үүнийг тест бүрт нотолсон.</p>
+<h3>5.5 Оролтын шалгалт ба алдааны мэдээлэл</h3>
+<p>Бүх тоог <code>strtol</code>-оор мөр бүтнээрээ уншдаг. Иймээс “12abc” болон хоосон утгыг хүлээж авахгүй. Хязгаар: worker 1–64, queue 1–4096, task 1–10000, хугацаа 1–60000 ms, ирэх зай 0–60000 ms, MIN ≤ MAX. Task-ийн файлын алдааг <code>файл:мөр</code> байршил, буруу утгын хамт мэдээлнэ. Буруу оролтын үед exit code 2 буцаана. Сервер энэ мэдээллийг UI-ийн улаан хайрцагт дамжуулдаг (Зураг 9, 10).</p>
+<h3>5.6 Зөв ажиллагааны дотоод шалгалт</h3>
+<p>Ажиллаж дууссаны дараа <code>main.c</code> trace-ээс 8 инвариант шалгана. Task бүр нийлбэр тооцоолдог тул үр дүн нь хүлээгдсэн утгатай тэнцэх ёстой. Мөн task бүрийн ажилласан тоог тусдаа mutex-тэй тоолуураар бүртгэнэ. Инвариантууд: accepted_run_once, results_correct, rejected_not_run, worker_exclusive, concurrency ≤ workers, queue ≤ capacity, start ≥ submit, submitted = completed. Аль нэг нь унавал exit code 4 буцаана.</p>
+
+<h2>6. Туршилт ба UI дүрслэл</h2>
+<h3>6.1 Юуг өөрчилж турших вэ</h3>
+<table class=""><tr><th>Параметр</th><th>UI / CLI</th><th>Ажиглах зүйл</th></tr><tr><td>Worker-ийн тоо</td><td>Worker thread / <code>-w</code></td><td>Зэрэгцээ ажиллах lane-ийн тоо, makespan, ашиглалт</td></tr><tr><td>Queue багтаамж</td><td>Queue багтаамж / <code>-q</code></td><td>Queue-ийн slot, дүүрэх үеийн REJECT (✕)</td></tr><tr><td>Дүүрэх үеийн бодлого</td><td>Дүүрэх үед / <code>-p reject|retry</code>, <code>-r</code></td><td>Татгалзсан task алга болох уу, эсвэл client хүлээгээд дахин оролдох уу</td></tr><tr><td>Ачаалал</td><td>Task-ийн тоо, хугацаа, ирэх зай, seed / <code>-n -d -a -s</code></td><td>Queue-ийн урт өсөх/буурах, хүлээлтийн хугацаа</td></tr><tr><td>Тодорхой сценари</td><td>Task жагсаалт, бэлэн тест / <code>-f</code></td><td>Burst, FIFO, урт+богино холимог</td></tr></table>
+<h3>6.2 UI-ийн элементүүд ба OS ойлголт</h3>
+<table class=""><tr><th>UI элемент</th><th>Харуулах зүйл</th><th>OS ойлголт</th></tr><tr><td>Worker lane (timeline)</td><td>Өнгөт bar = task ажиллаж буй хугацаа; судалтай саарал = idle</td><td>Worker <code>sem_wait</code> дээр блоклогдсон / <code>execute()</code></td></tr><tr><td>Worker карт</td><td>t агшин дахь төлөв (running Tk / idle / exited), явцын шугам, ✓ дууссан тоо</td><td>idle, running, completed (сэдвийн шаардлага)</td></tr><tr><td>Queue slot</td><td>Хүлээж буй task-ууд FIFO дарааллаар, багтаамжийн хоосон slot</td><td>Тойрог массив, <code>qcount</code></td></tr><tr><td>Queue-ийн урт (step chart)</td><td>Queue хугацааны явцад хэр дүүрсэн</td><td>Semaphore-ийн утга = queue-ийн урт</td></tr><tr><td>client мөр: | ба ✕</td><td>Submit хийсэн агшин, татгалзсан агшин</td><td><code>pool_submit()</code> 0 / 1 буцаалт</td></tr><tr><td>shutdown зураас, хар бүс</td><td><code>pool_shutdown()</code> дуудагдсан ба worker гарсан агшин</td><td>Cooperative shutdown, <code>pthread_join</code></td></tr><tr><td>Үйл явдлын тайлбар</td><td>Тухайн агшны үйл явдлыг API-ийн нэрээр</td><td>sem_post → sem_wait-аас сэрэх → dequeue</td></tr><tr><td>Playback</td><td>▶/⏸, өмнөх/дараагийн үйл явдал, гулсуур, 0.25×–10× хурд, timeline дээр дарж/чирэх, бүртгэлийн мөр дээр дарах</td><td>Алхамчилж эргэн шалгах</td></tr></table>
+<p>Дүрслэл бүхэлдээ C программын trace-ээс зурагддаг. JS симуляци огт байхгүй тул UI дээр харагдах хугацаа, worker-ийн хуваарилалт бүгд бодит ажиллагааных. Нэг параметрээр дахин ажиллуулахад worker-ийн хуваарилалт бага зэрэг өөр гарч болно. Энэ нь OS scheduler-ийн жинхэнэ nondeterminism юм (9-р хэсэг). “Trace хадгалах” товчоор тухайн ажиллуулалтыг JSON болгон хадгалж, дараа нь сервергүйгээр дахин үзэж болно.</p>
+
+<h2>7. Туршилтын арга</h2>
+<h3>7.1 Орчин</h3>
+<table class="kv"><tr><th>Зүйл</th><th>Утга</th></tr><tr><td>OS</td><td>Ubuntu 24.04.5 LTS, kernel 6.18.44-fc-v180</td></tr><tr><td>CPU</td><td>Intel(R) Xeon(R) Processor @ 2.30GHz, 2 core, x86_64</td></tr><tr><td>Compiler</td><td>gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0</td></tr><tr><td>libc / pthread</td><td>ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39</td></tr><tr><td>Python (UI сервер)</td><td>Python 3.13.18</td></tr><tr><td>Браузер (UI, screenshot)</td><td>Chromium 153 (headless, playwright)</td></tr></table>
+<h3>7.2 Өгөгдөл</h3>
+<p>Тестийн өгөгдөл: <code>tests/basic.txt</code> (номын анхдагч 3 worker / queue 10-д тохирох 10 task), <code>burst.txt</code> (10 task нэгэн зэрэг), <code>fifo.txt</code> (дараалал шалгах), <code>mixed_long_short.txt</code> (урт ба богино task), <code>bad_*.txt</code> (5 төрлийн буруу файл). Санамсаргүй ачааллыг seed-ээр тогтоосон тул ижил seed ижил ачаалал үүсгэнэ.</p>
+<h3>7.3 Шалгах арга</h3>
+<ol>
+<li><b>C талын шалгалт</b> — 5.6-д заасан 8 инвариант (<code>VERIFY: OK</code>).</li>
+<li><b>Хараат бус шалгагч</b> — <code>tests/verify_trace.py</code> trace-ээс queue-ийн уртыг SUBMIT/START-аар дахин сэргээж, бүртгэсэн <code>q</code>-тэй тулгана. Мөн нэг worker дээрх интервалууд давхцахгүй, START-ийн дараалал SUBMIT-ийн дараалалтай тэнцүү (FIFO), SHUTDOWN-ы дараа SUBMIT байхгүй, worker бүр WORKER_EXIT хийсэн эсэхийг шалгана.</li>
+<li><b>Хүлээгдсэн үр дүнгийн нөхцөл</b> (<code>--expect</code>) — тест бүрт хүлээн авсан/татгалзсан тоо, дээд зэрэгцээ.</li>
+<li><b>ThreadSanitizer</b> — <code>make tsan</code>: 4 worker, queue 3, 40 task, retry горимд өрсөлдөөнийг ихэсгэсэн ачаалал.</li>
+<li><b>Буруу оролт</b> — exit code 2 ба мессежийн агуулгыг шалгана.</li>
+</ol>
+
+<h2>8. Үр дүн</h2>
+<h3>8.1 Үндсэн ба захын тест</h3>
+<p>Тушаал: <code>make test</code>. Нийт <b>29 PASS, 0 FAIL</b>. Номын <code>client.c</code> жишээ: <b class="pass">PASS</b> (5, 10 → 15; 1, 2 → 3; 100, 200 → 300; −7, 7 → 0; 40, 2 → 42). Доорх “Бодит” багана нь сүүлийн ажиллуулалтын гаралт.</p>
+<table class=""><tr><th>Тест / команд</th><th>Нөхцөл</th><th>Хүлээгдсэн</th><th>Бодит</th><th></th></tr><tr><td><b>basic_default</b><br><span class='mono small'>-f tests/basic.txt</span></td><td>Номын анхдагч: 3 worker, queue 10, tests/basic.txt (10 task)</td><td>10 хүлээн авна, 0 татгалзана, нэгэн зэрэг ≤ 3</td><td><span class='mono small'>accepted=10 rejected=0 max_running=3 max_queue=4 avg_wait=139.9ms util=91.7%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>burst_reject</b><br><span class='mono small'>-w 2 -q 3 -f tests/burst.txt</span></td><td>10 task t=0-д, 2 worker, queue 3, reject</td><td>3..5 хүлээн авч, ≥ 5 татгалзана (номын 'дүүрвэл 1 буцаана')</td><td><span class='mono small'>accepted=3 rejected=7 max_running=2 max_queue=3 avg_wait=100.0ms util=75.0%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>burst_retry</b><br><span class='mono small'>-w 2 -q 3 -f tests/burst.txt -p retry -r 20</span></td><td>Дээрхтэй ижил, policy=retry</td><td>10 бүгд хүлээн авагдана, queue ≤ 3</td><td><span class='mono small'>accepted=10 rejected=0 max_running=2 max_queue=3 avg_wait=324.5ms util=100.0%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>fifo_one_worker</b><br><span class='mono small'>-w 1 -f tests/fifo.txt</span></td><td>1 worker, tests/fifo.txt</td><td>Task-ууд ирсэн дарааллаараа (FIFO) ажиллана</td><td><span class='mono small'>accepted=6 rejected=0 max_running=1 max_queue=5 avg_wait=164.4ms util=100.0%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>long_short_mix</b><br><span class='mono small'>-w 3 -f tests/mixed_long_short.txt</span></td><td>1 урт (1500 ms) + 7 богино, 3 worker</td><td>Урт task нэг worker-ийг эзлэхэд бусад нь богинуудыг гүйцэтгэнэ</td><td><span class='mono small'>accepted=8 rejected=0 max_running=3 max_queue=5 avg_wait=90.5ms util=49.0%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>random_seeded</b><br><span class='mono small'>-w 4 -q 8 -n 20 -d 50-200 -a 10-40 -s 7</span></td><td>4 worker, queue 8, 20 санамсаргүй task, seed 7</td><td>20 бүгд хүлээн авагдана</td><td><span class='mono small'>accepted=20 rejected=0 max_running=4 max_queue=5 avg_wait=66.7ms util=89.3%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>queue_cap_1</b><br><span class='mono small'>-w 1 -q 1 -n 6 -d 100 -a 0</span></td><td>Захын: queue 1, 1 worker, 6 task t=0</td><td>≥ 1 татгалзал, queue хэзээ ч 1-ээс хэтрэхгүй</td><td><span class='mono small'>accepted=1 rejected=5 max_running=1 max_queue=1 avg_wait=0.0ms util=100.0%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>more_workers</b><br><span class='mono small'>-w 8 -q 4 -n 3 -d 100 -a 0</span></td><td>Захын: 8 worker, 3 task</td><td>3 task, 5 worker idle хэвээр, зөв зогсоно</td><td><span class='mono small'>accepted=3 rejected=0 max_running=3 max_queue=3 avg_wait=0.0ms util=37.5%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>max_workers_64</b><br><span class='mono small'>-w 64 -q 64 -n 64 -d 50 -a 0</span></td><td>Захын: 64 worker (дээд хязгаар), 64 task</td><td>64 нэгэн зэрэг ажиллаж болно</td><td><span class='mono small'>accepted=64 rejected=0 max_running=64 max_queue=23 avg_wait=0.1ms util=98.9%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>single_task</b><br><span class='mono small'>-w 1 -q 1 -n 1 -d 1</span></td><td>Захын: 1 task, 1 ms</td><td>1 хүлээн авч дуусгана</td><td><span class='mono small'>accepted=1 rejected=0 max_running=1 max_queue=1 avg_wait=0.0ms util=97.5%</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><b>stress_500</b><br><span class='mono small'>-w 8 -q 16 -n 500 -d 1-3 -a 0 -p retry -r 1</span></td><td>Ачаалал: 500 task, 8 worker, queue 16, retry</td><td>500 бүгд яг 1 удаа ажиллана</td><td><span class='mono small'>accepted=500 rejected=0 max_running=8 max_queue=16 avg_wait=3.6ms util=98.9%</span></td><td><b class='pass'>PASS</b></td></tr></table>
+<h3>8.2 Буруу оролтын тест</h3>
+<table class=""><tr><th>Тест</th><th>Программын мэдээлэл (бодит гаралт)</th><th></th></tr><tr><td><span class='mono'>err_workers_0</span></td><td><span class='small'>Алдаа: -w буруу (&#x27;0&#x27;): worker-ийн тоо 1..64 бүхэл тоо байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_workers_65</span></td><td><span class='small'>Алдаа: -w буруу (&#x27;65&#x27;): worker-ийн тоо 1..64 бүхэл тоо байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_queue_0</span></td><td><span class='small'>Алдаа: -q буруу (&#x27;0&#x27;): queue-ийн багтаамж 1..4096 байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_queue_text</span></td><td><span class='small'>Алдаа: -q буруу (&#x27;abc&#x27;): queue-ийн багтаамж 1..4096 байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_tasks_0</span></td><td><span class='small'>Алдаа: -n буруу (&#x27;0&#x27;): task-ийн тоо 1..10000 байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_dur_0</span></td><td><span class='small'>Алдаа: -d буруу (&#x27;0&#x27;): &#x27;MIN&#x27; эсвэл &#x27;MIN-MAX&#x27;, 1..60000 ms.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_dur_order</span></td><td><span class='small'>Алдаа: -d буруу (&#x27;500-100&#x27;): MIN нь MAX-аас их байж болохгүй.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_gap_neg</span></td><td><span class='small'>Алдаа: -a буруу (&#x27;-5&#x27;): &#x27;MIN&#x27; эсвэл &#x27;MIN-MAX&#x27;, 0..60000 ms.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_policy</span></td><td><span class='small'>Алдаа: -p буруу (&#x27;fifo&#x27;): &#x27;reject&#x27; эсвэл &#x27;retry&#x27; байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_missing_val</span></td><td><span class='small'>Алдаа: &#x27;-w&#x27; сонголтод утга өгөөгүй байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_unknown_opt</span></td><td><span class='small'>Алдаа: Танигдаагүй сонголт &#x27;-x&#x27;.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_missing</span></td><td><span class='small'>Алдаа: &#x27;tests/no_such_file.txt&#x27; файлыг нээж чадсангүй (No such file or directory).</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_number</span></td><td><span class='small'>Алдаа: tests/bad_number.txt:2 — arrival_ms буруу (&#x27;abc&#x27;). 0..3600000 бүхэл тоо байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_sorted</span></td><td><span class='small'>Алдаа: tests/bad_unsorted.txt:2 — arrival_ms өсөхгүй дарааллаар байна (&#x27;50&#x27;). Эрэмбэлэгдсэн байх ёстой.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_columns</span></td><td><span class='small'>Алдаа: tests/bad_columns.txt:1 — мөр бүр &#x27;arrival_ms duration_ms&#x27; гэсэн 2 тоотой байх ёстой.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_dur0</span></td><td><span class='small'>Алдаа: tests/bad_duration.txt:1 — duration_ms буруу (&#x27;0&#x27;). 1..60000 бүхэл тоо байна.</span></td><td><b class='pass'>PASS</b></td></tr><tr><td><span class='mono'>err_file_empty</span></td><td><span class='small'>Алдаа: &#x27;tests/bad_empty.txt&#x27; файлд нэг ч task алга.</span></td><td><b class='pass'>PASS</b></td></tr></table>
+<p>ThreadSanitizer (<code>make tsan</code>): race condition илрээгүй, <code>VERIFY: OK</code>.</p>
+
+<h3>8.3 Туршилт 1 — worker-ийн тоо ба гүйцэтгэл</h3>
+<p>40 task, хугацаа 100–300 ms, бүгд t=0-д ирнэ, queue 64, seed 1 (<code>tests/experiments.sh</code>).</p>
+<table class=""><tr><th>Worker</th><th>Хүлээн авсан</th><th>Makespan, ms</th><th>Дундаж хүлээлт, ms</th><th>Дундаж turnaround, ms</th><th>Ашиглалт, %</th><th>Хурдатгал</th></tr><tr><td>1</td><td>40</td><td>8373</td><td>4019</td><td>4229</td><td>100.0</td><td>1.00×</td></tr><tr><td>2</td><td>40</td><td>4222</td><td>1954</td><td>2164</td><td>99.2</td><td>1.98×</td></tr><tr><td>4</td><td>40</td><td>2196</td><td>921</td><td>1130</td><td>95.3</td><td>3.81×</td></tr><tr><td>8</td><td>40</td><td>1139</td><td>406</td><td>615</td><td>91.9</td><td>7.35×</td></tr><tr><td>16</td><td>40</td><td>646</td><td>151</td><td>360</td><td>81.0</td><td>12.95×</td></tr></table>
+<p>Makespan worker-ийн тоонд бараг урвуу пропорциональ буурсан (2 worker → 1.98×, 8 worker → 7.35×). 16 worker-т ашиглалт 81% хүртэл буурсан. 40 task 16 worker-т тэгш хуваагдахгүй тул сүүлийн “давалгаа”-нд зарим worker idle үлддэг.</p>
+
+<h3>8.4 Туршилт 2 — queue-ийн багтаамж ба татгалзал</h3>
+<p>2 worker, 20 task t=0-д, тус бүр 100 ms, reject горим.</p>
+<table class=""><tr><th>Queue багтаамж</th><th>Хүлээн авсан</th><th>Татгалзсан</th><th>Queue дээд урт</th><th>Makespan, ms</th></tr><tr><td>1</td><td>1</td><td>19</td><td>1</td><td>102</td></tr><tr><td>2</td><td>2</td><td>18</td><td>2</td><td>100</td></tr><tr><td>4</td><td>4</td><td>16</td><td>4</td><td>200</td></tr><tr><td>8</td><td>8</td><td>12</td><td>8</td><td>401</td></tr><tr><td>16</td><td>16</td><td>4</td><td>16</td><td>801</td></tr><tr><td>20</td><td>20</td><td>0</td><td>20</td><td>1002</td></tr></table>
+<p>Хүлээн авсан task-ийн тоо багтаамжтай яг тэнцүү гарсан. Client 20 task-ийг микросекундын дотор submit хийдэг бол worker <code>sem_wait</code>-аас сэрж dequeue хийхэд түүнээс урт хугацаа шаардлагатай. Тиймээс burst-ийн үед queue хоосрохоос өмнө дүүрнэ. Энэ нь номын “массив queue дүүрвэл 1 буцаана” гэсэн тодорхойлолтыг шууд харуулна.</p>
+
+<h3>8.5 Туршилт 3 — reject ба retry бодлого</h3>
+<p>2 worker, queue 3, 20 task 10 ms зайтай, 100 ms.</p>
+<table class=""><tr><th>Policy</th><th>Хүлээн авсан task</th><th>Татгалзсан оролдлого</th><th>Makespan, ms</th><th>Дундаж хүлээлт, ms</th></tr><tr><td>reject</td><td>7</td><td>13</td><td>400</td><td>88</td></tr><tr><td>retry</td><td>20</td><td>38</td><td>1011</td><td>120</td></tr></table>
+<p>Reject горимд task алдагдсан ч makespan богино байна. Retry горимд бүх task гүйцэтгэгдсэн боловч client хүлээсэн тул нийт хугацаа уртассан. Сонголт нь хэрэглээнээс хамаарна: ачаалал ихтэй вэб сервер хүсэлтээс татгалздаг бол batch боловсруулалтад retry тохиромжтой.</p>
+
+<h3>8.6 UI дүрслэлийн бодит screenshot</h3>
+<figure><img src="../img/01_default_run.png" style="width:100%"><figcaption>Зураг 3. Анхдагч ажиллуулалт (3 worker, queue 5, 15 task). t≈45% агшинд 3 worker бүгд running, queue-д 3 task хүлээж, 2 task татгалзсан (client мөрөн дэх ✕).</figcaption></figure>
+<figure><img src="../img/03_burst_reject.png" style="width:100%"><figcaption>Зураг 4. Burst + reject (2 worker, queue 3). t=30 ms: T0, T1 ажиллаж, T2 queue-д, 7 task татгалзсан. Shutdown-ы дараа W1 idle болж гарсан (хар бүс).</figcaption></figure>
+<figure><img src="../img/04_burst_retry.png" style="width:100%"><figcaption>Зураг 5. Ижил burst, retry горим: client дүүрсэн queue-д дахин оролдож (✕ олон), 10 task бүгд гүйцэтгэгдсэн.</figcaption></figure>
+<figure><img src="../img/05_fifo_step.png" style="width:100%"><figcaption>Зураг 6. 1 worker, FIFO тест — “дараагийн үйл явдал” товчоор алхамчилсан. Queue-д T3, T4, T5 ирсэн дарааллаараа хүлээж байна.</figcaption></figure>
+<figure><img src="../img/06_long_short.png" style="width:100%"><figcaption>Зураг 7. Урт (T0 = 1500 ms) + богино task: W0 урт task-аар эзлэгдсэн ч W1, W2 богинуудыг гүйцэтгэсээр байна.</figcaption></figure>
+<figure><img src="../img/07_eight_workers.png" style="width:100%"><figcaption>Зураг 8. 8 worker, queue 16, 60 task — queue-ийн урт ачааллын давалгааг дагаж өсөж буурна.</figcaption></figure>
+<div class="two"><figure><img src="../img/08_error_workers0.png" style="width:100%"><figcaption>Зураг 9. Worker = 0 — C программын алдааны мэдээлэл UI-д.</figcaption></figure><figure><img src="../img/09_error_file.png" style="width:100%"><figcaption>Зураг 10. Task жагсаалтын 2-р мөрөнд буруу утга.</figcaption></figure></div>
+<figure><img src="../img/10_dark_mode.png" style="width:100%"><figcaption>Зураг 11. Харанхуй горим (системийн тохиргоог дагана).</figcaption></figure>
+
+<h2>9. Хэлэлцүүлэг</h2>
+<h3>9.1 Үр дүнгийн тайлбар</h3>
+<ul>
+<li><b>Зөв ажиллагаа.</b> Бүх тестэд task бүр яг 1 удаа ажиллаж, нэг worker давхар ажил аваагүй, queue FIFO-оор ажиллаж, багтаамжаас хэтрээгүй. Энэ нь mutex queue-ийн өгөгдлийг хамгаалж, semaphore task-ийн тоог зөв тоолж байгааг харуулна. 500 task-ийн stress тест болон TSan нь өрсөлдөөн ихтэй нөхцөлд ч алдаа гараагүйг нотолсон.</li>
+<li><b>Блоклох хүлээлт.</b> Idle worker-ууд <code>sem_wait</code> дээр унтдаг тул CPU үрэхгүй. Timeline-ийн судалтай бүс тэдгээрийн бодит хүлээлт юм.</li>
+<li><b>Гүйцэтгэл.</b> Task-ууд sleep хийдэг (I/O-той адил) учраас worker-ийн тоо CPU core-оос (2) олон байсан ч хурдатгал шугаман хэвээр байсан. CPU-д ачаалалтай ажил бол core-ийн тоогоор хязгаарлагдана.</li>
+<li><b>Nondeterminism.</b> Ижил параметрээр дахин ажиллуулахад аль worker аль task-ийг авах нь өөрчлөгдөж болно. Хүлээн авсан task-ийн тоо (8.1-ийн burst_reject: 3–5) ч мөн өөрчлөгдөж болно. Энэ нь OS scheduler-ийн шийдвэр бөгөөд тест ийм хэлбэлзлийг тооцож мужаар шалгадаг.</li>
+</ul>
+<h3>9.2 Хязгаарлалт</h3>
+<ul>
+<li>Task-ийн ажлыг <code>nanosleep</code>-ээр дуурайлгасан (номын зөвлөмж). Бодит CPU-д ачаалалтай ажилд хурдатгал core-ийн тоогоор хязгаарлагдана.</li>
+<li>Trace бүртгэл тусдаа mutex ашигладаг тул маш богино (&lt; 1 ms) task-уудад бага зэргийн нэмэлт зардал үүсгэж, үйл явдлыг цуваа болгодог.</li>
+<li>Нэг client thread submit хийдэг. Retry горимд түүний хүлээлт дараагийн task-уудын submit-ийг хойшлуулна.</li>
+<li>UI-д нэг ажиллуулалтыг 2000 task, тооцоолсон ~60 секундээр хязгаарласан. CLI 10000 task хүртэл зөвшөөрнө.</li>
+<li>Pool нэг процесст нэг ширхэг (номын API глобал төлөвтэй). Олон pool шаардлагатай бол handle-тэй API руу шилжих хэрэгтэй.</li>
+<li>macOS-ийн <code>dispatch_semaphore</code> зам CI-д тохируулагдсан боловч бид зөвхөн Linux (Ubuntu 24.04) дээр бүрэн туршсан.</li>
+</ul>
+
+<h2>10. Дүгнэлт</h2>
+<p>Номын Project 1-ийн POSIX хувилбарыг бүрэн хэрэгжүүлсэн: <code>pool_init</code> thread, mutex, semaphore үүсгэнэ; <code>pool_submit</code> массив queue-д enqueue хийж, дүүрвэл 1 буцаана; worker semaphore дээр хүлээж dequeue → execute хийнэ; <code>pool_shutdown</code> бүх task-ийг гүйцээгээд <code>pthread_join</code> хийнэ. Номын <code>client.c</code> жишээ өөрчлөлтгүй ажилласан.</p>
+<p>Нотолсон үр дүн: 29 тест амжилттай, хараат бус trace шалгагч болон ThreadSanitizer-ээр race condition, давхар гүйцэтгэл, FIFO зөрчил илрээгүй. Worker нэмэхэд гүйцэтгэл бараг шугаман сайжирсан. Queue-ийн багтаамж burst-ийн үед хүлээн авах task-ийн тоог шууд тодорхойлдог. “Worker activity” UI нь бодит trace-ээр worker бүрийн idle/running/completed төлөв, queue, татгалзлыг алхамчлан харуулж, параметрийг өөрчлөн дахин ажиллуулах боломжтой.</p>
+<p>Цаашид: task-ийн priority queue, worker-ийн тоог ачааллаар динамикаар өөрчлөх, Java хувилбар (<code>synchronized/wait/notify</code>) хийж харьцуулах.</p>
+
+<h2>11. GitHub дээрх ажиллагаа, AI ашиглалт</h2>
+<div class="box">
+<p><b>Repository:</b> <span class="mono">https://github.com/<team>/IV-2-9-threadpool</span> — README (Quick Start), <code>src/</code>, <code>tests/</code>, <code>examples/</code>, <code>docs/</code> бүтэцтэй. <code>.github/workflows/ci.yml</code> push бүрт build, <code>make test</code>, ThreadSanitizer-ийг автоматаар ажиллуулна. 9-р долоо хоногт <code>v1.0</code> tag/release нийтэлнэ.</p>
+<p><b>Багийн ажлын урсгал</b> (бөглөнө): гишүүн бүр өөрийн branch дээр ажиллаж, Pull Request-оор нэгтгэж, нэг нь review хийсэн. Commit-ийн тоо ба гол PR-уудыг Хавсралт A-ийн “Commit/file” баганад бичнэ. GitHub-ийн Insights → Contributors дэлгэцийн зургийг энд хавсаргана.</p>
+<p><b>AI ба бэлэн код:</b> Номын API нэр, <code>client.c</code>-ийн бүтэц сурах бичгээс авсан. Код, UI, тест, баримт бичгийн анхны хувилбарыг AI туслахын тусламжтай бэлтгэсэн. Баг бүх кодыг уншиж ойлгосон, ажиллуулсан, тестээр баталгаажуулсан, өөрчилсөн хэсгээ commit-оор тэмдэглэсэн. Гадны сан ашиглаагүй.</p>
+</div>
+
+<h2>Ашигласан материал</h2>
+<ol>
+<li>A. Silberschatz, P. B. Galvin, G. Gagne. <i>Operating System Concepts</i>, 10th ed., Wiley, 2018. Бүлэг 4.5.1 (Thread pools), 4.6.3 (Thread cancellation), 6.5–6.6 (Mutex, Semaphores), 7.1.1 (Bounded buffer), 7.3 (POSIX synchronization), Programming Project 1.</li>
+<li>The Open Group. <i>POSIX.1-2017</i>: <code>pthread_create</code>, <code>pthread_join</code>, <code>pthread_mutex_lock</code>, <code>sem_init</code>, <code>sem_wait</code>, <code>sem_post</code>, <code>clock_gettime</code>.</li>
+<li>Linux man-pages: <code>sem_overview(7)</code>, <code>pthreads(7)</code>, <code>nanosleep(2)</code>.</li>
+<li>Clang/GCC ThreadSanitizer documentation.</li>
+<li>Apple Developer Documentation: <code>dispatch_semaphore_create</code>.</li>
+<li>F.CSM302 “Бие даалт 1” удирдамж, “Сэдэв ба шүүмжийн хуваарилалт”.</li>
+</ol>
+
+<h2 class="page-break">Хавсралт A. Ажлын төлөвлөгөө</h2>
+<table class="kv"><tr><th>Талбар</th><th>Мэдээлэл</th></tr><tr><td>Хуваарилалтын код</td><td>IV-2-9</td></tr><tr><td>Төсөл</td><td>Designing a Thread Pool (OSC Ch.7, Project 1)</td></tr><tr><td>Repository</td><td>https://github.com/<team>/IV-2-9-threadpool</td></tr><tr><td>Хэл/сан/орчин</td><td>C11 + Pthreads, Python 3 stdlib, HTML/JS; Linux (Ubuntu 24.04), gcc 13</td></tr><tr><td>Үндсэн дүрслэл</td><td>Worker activity (worker lane timeline + төлөвийн карт + queue)</td></tr></table>
+<table class=""><tr><th>Гишүүн</th><th>Хариуцах ажил</th><th>Commit/file</th></tr><tr><td>[Гишүүн 1 нэр]</td><td>Thread pool цөм (src/threadpool.c), mutex/semaphore</td><td>[commit тоо] · src/threadpool.c, threadpool.h</td></tr><tr><td>[Гишүүн 2 нэр]</td><td>Туршилтын программ (src/main.c), тест</td><td>[commit тоо] · src/main.c, tests/</td></tr><tr><td>[Гишүүн 3 нэр]</td><td>Interactive UI, сервер, тайлан</td><td>[commit тоо] · ui/index.html, tools/, docs/</td></tr></table>
+<table class=""><tr><th>Тест</th><th>Оролт/нөхцөл</th><th>Хүлээгдсэн үр дүн</th></tr><tr><td>1</td><td><code>./build/client</code> (номын жишээ)</td><td>5 нийлбэр зөв хэвлэгдэнэ</td></tr><tr><td>2</td><td><code>-f tests/basic.txt</code> (3 worker, queue 10)</td><td>10/10 хүлээн авч дуусгана, зэрэгцээ ≤ 3</td></tr><tr><td>3</td><td><code>-w 2 -q 3 -f tests/burst.txt</code></td><td>3–5 хүлээн авна, үлдсэнийг татгалзана (1 буцаана)</td></tr><tr><td>4</td><td><code>-w 1 -f tests/fifo.txt</code></td><td>Ирсэн дарааллаар (FIFO)</td></tr><tr><td>5</td><td><code>-w 0</code>, <code>-f tests/bad_*.txt</code></td><td>Exit 2, алдаатай мөр ба утгыг заасан мэдээлэл</td></tr></table>
+</body></html>
